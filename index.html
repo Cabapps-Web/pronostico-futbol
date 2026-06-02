@@ -13,6 +13,15 @@ body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#020814;color:#f
 .hidden{display:none!important}
 
 .logo{display:block;width:88px;margin:14px auto 7px;filter:drop-shadow(0 0 18px #57ff39)}
+
+.logo,
+.topbar img{
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+  touch-action:none;
+}
+
 .brand{text-align:center;font-size:28px;font-weight:900;line-height:1;margin:0}
 .brand span{color:#56ff33}
 .slogan{text-align:center;margin:8px 0 14px;color:#d7e7ff;font-weight:bold;font-size:14px}
@@ -178,7 +187,7 @@ button.disabledBtn{
 <div class="screen">
 
 <section id="welcome">
-  <img class="logo" src="logo.png" alt="Logo" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()">
+  <img class="logo" src="logo.png" alt="Logo" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;">
   <h1 class="brand">PRONÓSTICO <span>DE FÚTBOL</span></h1>
   <p class="slogan">Demostrá que sos vos el que más sabe.</p>
 
@@ -195,7 +204,7 @@ button.disabledBtn{
 
 
 <section id="juegoResponsable" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
 
   <div class="card responsableBox">
     <div class="responsableIcon">⚠️</div>
@@ -227,7 +236,7 @@ button.disabledBtn{
 </section>
 
 <section id="registro" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
   <div class="card">
     <h2>Crear perfil</h2>
     <p class="small">Tu perfil queda guardado en este celular.</p>
@@ -242,7 +251,7 @@ button.disabledBtn{
 </section>
 
 <section id="examen" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
   <div class="card">
     <h2>Veamos Cuanto Sabés</h2>
     <p class="small">Respondé 5 preguntas y ganá tu primera insignia.</p>
@@ -253,7 +262,7 @@ button.disabledBtn{
 
 
 <section id="resultadoExamen" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
   <div class="card">
     <div class="resultBox">
       <h2>Resultado del desafío</h2>
@@ -268,7 +277,7 @@ button.disabledBtn{
 </section>
 
 <section id="home" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
 
   <div id="viewInicio">
     <div class="card">
@@ -1080,7 +1089,12 @@ function icono(tipo){
 
 let devLogoTimer=null;
 
-function devLogoDown(){
+function devLogoDown(e){
+ if(e){
+  e.preventDefault();
+  e.stopPropagation();
+ }
+ devLogoUp();
  devLogoTimer=setTimeout(()=>{
   abrirDevModal();
  },5000);
