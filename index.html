@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pronóstico de Fútbol</title>
+
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#020814;color:#fff}
+.app{max-width:430px;margin:auto;min-height:100vh;background:linear-gradient(180deg,#071c3a,#03101f 55%,#010713);padding-bottom:82px}
+.screen{padding:18px}
+.hidden{display:none!important}
+
+.logo{display:block;width:88px;margin:14px auto 7px;filter:drop-shadow(0 0 18px #57ff39)}
+.brand{text-align:center;font-size:28px;font-weight:900;line-height:1;margin:0}
+.brand span{color:#56ff33}
+.slogan{text-align:center;margin:8px 0 14px;color:#d7e7ff;font-weight:bold;font-size:14px}
+
+.hero{background:#061529;border:1px solid #ffffff22;border-radius:28px;overflow:hidden;box-shadow:0 18px 45px #0008;margin-bottom:14px}
+.hero img{width:100%;height:500px;object-fit:cover;object-position:center top;display:block}
+.heroText{padding:15px}
+.heroText h2{margin:0 0 6px;font-size:20px}
+.heroText p{margin:0;color:#bdd0e8;font-size:14px;line-height:1.35}
+
+.card{background:#07182d;border:1px solid #ffffff22;border-radius:24px;padding:16px;margin:13px 0;box-shadow:0 12px 28px #0007}
+.card h2,.card h3{margin:0 0 10px}
+.small{font-size:13px;color:#bdd0e8}
+
+button{width:100%;border:0;border-radius:17px;background:linear-gradient(135deg,#4cff32,#9dff00);color:#06130b;font-weight:900;font-size:16px;padding:15px;margin-top:10px}
+button.secondary{background:transparent;color:white;border:1px solid #ffffff66}
+button.dark{background:#ffffff12;color:white;border:1px solid #ffffff22}
+
+input,select{width:100%;padding:14px;border-radius:15px;border:1px solid #ffffff26;background:#04101f;color:white;margin:7px 0;font-size:15px}
+
+.topbar{display:flex;align-items:center;gap:9px;font-weight:900;margin-bottom:12px}
+.topbar img{width:42px;height:42px;object-fit:contain}
+
+.badge{display:inline-block;background:linear-gradient(135deg,#ffd84c,#ff9900);color:#111;padding:8px 12px;border-radius:999px;font-weight:900;margin:6px 0}
+.row{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #ffffff16}
+.row:last-child{border-bottom:0}
+
+.match{background:#ffffff0b;border:1px solid #ffffff17;border-radius:18px;padding:14px;margin:10px 0}
+.matchHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.groupTag{background:#56ff33;color:#06130b;font-weight:900;font-size:12px;padding:5px 9px;border-radius:999px}
+.timeTag{font-size:12px;color:#bdd0e8}
+.teams{display:flex;justify-content:space-between;align-items:center;font-weight:900;gap:8px}
+.team{width:42%;font-size:15px}
+.vs{font-size:12px;color:#bdd0e8}
+.score{display:flex;gap:8px;align-items:center;margin-top:10px}
+.score input{text-align:center;font-size:23px;font-weight:900}
+
+.groupBlock{margin:16px 0}
+.groupTitle{font-size:19px;font-weight:900;color:#56ff33;margin:8px 0}
+.dayTitle{background:#ffffff10;border:1px solid #ffffff14;border-radius:14px;padding:10px;margin:12px 0 8px;font-weight:900}
+.simultaneo{font-size:12px;color:#ffd84c;font-weight:900;margin-top:4px}
+
+.option{display:flex;justify-content:space-between;align-items:center;background:#ffffff0b;border-radius:14px;padding:10px;margin:7px 0}
+.option input{width:auto}
+
+.invite{background:linear-gradient(135deg,#4cff3227,#1467ff28);border-color:#4cff3270}
+
+.bottomNav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#020814ee;border-top:1px solid #ffffff22;display:grid;grid-template-columns:repeat(5,1fr);padding:8px 4px 10px;z-index:20}
+.bottomNav button{background:transparent;color:#dbe8f7;margin:0;padding:7px 2px;font-size:11px;border-radius:12px}
+.bottomNav button.active{color:#59ff35}
+.navIcon{display:block;font-size:21px;margin-bottom:2px}
+
+.toast{position:fixed;bottom:86px;left:50%;transform:translateX(-50%);background:#56ff33;color:#06130b;font-weight:900;border-radius:16px;padding:14px;width:calc(100% - 34px);max-width:390px;text-align:center;display:none;z-index:50}
+
+.devOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.72);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:999;
+}
+.devModal{
+  width:100%;
+  max-width:390px;
+  background:#07182d;
+  border:1px solid #ffffff2b;
+  border-radius:24px;
+  padding:18px;
+  box-shadow:0 20px 60px #000;
+}
+.devModal h2{
+  margin:0 0 10px;
+}
+.devWarn{
+  color:#ffd84c;
+  font-size:14px;
+  line-height:1.4;
+}
+.devDanger{
+  background:linear-gradient(135deg,#ff4c4c,#ff9800);
+  color:#170303;
+}
+
+
+.responsableBox{
+  text-align:center;
+}
+.responsableIcon{
+  font-size:46px;
+  margin:8px 0 10px;
+}
+.responsableText{
+  color:#d7e7ff;
+  font-size:15px;
+  line-height:1.45;
+  margin:12px 0;
+}
+.responsablePhone{
+  display:inline-block;
+  background:#ffffff12;
+  border:1px solid #ffffff22;
+  border-radius:16px;
+  padding:12px 16px;
+  margin:10px 0;
+  font-size:22px;
+  font-weight:900;
+  color:#56ff33;
+}
+.checkRow{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  background:#ffffff0b;
+  border:1px solid #ffffff17;
+  border-radius:16px;
+  padding:12px;
+  margin:16px 0 6px;
+  text-align:left;
+}
+.checkRow input{
+  width:auto;
+  margin-top:3px;
+}
+.checkRow span{
+  font-size:14px;
+  color:#dbe8f7;
+  line-height:1.35;
+}
+button.disabledBtn{
+  opacity:.45;
+  pointer-events:none;
+}
+
+
+.resultBox{
+  text-align:center;
+  padding:10px 0;
+}
+.resultScore{
+  font-size:48px;
+  font-weight:900;
+  color:#56ff33;
+  margin:10px 0 2px;
+}
+.resultBad{
+  color:#ff7979;
+  font-weight:900;
+}
+.resultGood{
+  color:#56ff33;
+  font-weight:900;
+}
+
+
+</style>
+</head>
+
+<body>
+<div class="app">
+<div class="screen">
+
+<section id="welcome">
+  <img class="logo" src="logo.png" alt="Logo" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()">
+  <h1 class="brand">PRONÓSTICO <span>DE FÚTBOL</span></h1>
+  <p class="slogan">Demostrá que sos vos el que más sabe.</p>
+
+  <div class="hero">
+    <img src="futbolista.png" alt="Futbolista">
+    <div class="heroText">
+      <h2>⚽ Pronosticá resultados y competí con tu comunidad</h2>
+      <p>Participá solo o junto a amigos, familia, compañeros de trabajo y grupos. Sumá puntos y escalá posiciones en el ranking general.</p>
+    </div>
+  </div>
+
+  <button onclick="goJuegoResponsable()">COMENZAR</button>
+</section>
+
+
+<section id="juegoResponsable" class="hidden">
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+
+  <div class="card responsableBox">
+    <div class="responsableIcon">⚠️</div>
+    <h2>Juego Responsable</h2>
+
+    <p class="responsableText">
+      El juego compulsivo es perjudicial para tu salud y la de tu familia.
+    </p>
+
+    <p class="small">
+      Línea de Prevención de la Ludopatía<br>
+      (CABA y Provincia de Buenos Aires)
+    </p>
+
+    <div class="responsablePhone">0800-333-0300</div>
+
+    <p class="responsableText">
+      Esta aplicación es recreativa, gratuita y no realiza apuestas con dinero real.
+    </p>
+
+    <label class="checkRow">
+      <input id="checkResponsable" type="checkbox" onchange="validarResponsable()">
+      <span>He leído y comprendido esta información.</span>
+    </label>
+
+    <button id="btnContinuarResponsable" class="disabledBtn" onclick="continuarRegistro()">ENTENDIDO, CONTINUAR</button>
+    <button class="secondary" onclick="volverWelcome()">Volver</button>
+  </div>
+</section>
+
+<section id="registro" class="hidden">
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="card">
+    <h2>Crear perfil</h2>
+    <p class="small">Tu perfil queda guardado en este celular.</p>
+    <input id="nombre" placeholder="Nombre">
+    <input id="apellido" placeholder="Apellido">
+    <input id="edad" type="number" placeholder="Edad">
+    <input id="ciudad" placeholder="Ciudad">
+    <input id="hincha" placeholder="Hincha de...">
+    <button onclick="crearPerfil()">Crear perfil</button>
+    <button class="secondary" onclick="volverWelcome()">Volver</button>
+  </div>
+</section>
+
+<section id="examen" class="hidden">
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="card">
+    <h2>Veamos Cuanto Sabés</h2>
+    <p class="small">Respondé 5 preguntas y ganá tu primera insignia.</p>
+    <div id="preguntas"></div>
+    <button onclick="finalizarExamen()">Finalizar examen</button>
+  </div>
+</section>
+
+
+<section id="resultadoExamen" class="hidden">
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="card">
+    <div class="resultBox">
+      <h2>Resultado del desafío</h2>
+      <p class="small">Así te fue en las preguntas mundialistas.</p>
+      <div id="resultadoPuntaje" class="resultScore"></div>
+      <div id="resultadoDetalle"></div>
+      <div id="resultadoInsignia" class="badge"></div>
+      <p id="resultadoMensaje" class="small"></p>
+      <button onclick="entrarDespuesDelExamen()">Entrar a la app</button>
+    </div>
+  </div>
+</section>
+
+<section id="home" class="hidden">
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+
+  <div id="viewInicio">
+    <div class="card">
+      <h2 id="saludo"></h2>
+      <div id="insignia" class="badge"></div>
+      <p id="perfilDato" class="small"></p>
+      <div class="row"><span>Mi posición general</span><b>1°</b></div>
+      <div class="row"><span>Mis puntos</span><b><span id="puntosHome">0</span> pts</b></div>
+    </div>
+
+    <div class="card invite">
+      <h3>Invitá a alguien a jugar</h3>
+      <p class="small">Compartí la app con un amigo, familiar o compañero.</p>
+      <button onclick="invitarGeneral()">📲 Compartir invitación</button>
+    </div>
+
+    <div class="card">
+      <h3>Próximos partidos</h3>
+      <p class="small">Fixture real de fase de grupos. Hora Argentina.</p>
+      <button onclick="showView('partidos')">Ver fixture y pronosticar</button>
+    </div>
+
+    <div class="card">
+      <h3>Ranking general</h3>
+      <div id="rankingInicio"></div>
+    </div>
+  </div>
+
+  <div id="viewPartidos" class="hidden">
+    <div class="card">
+      <h2>Fixture Mundial 2026</h2>
+      <p class="small">Fase de grupos ordenada por grupo, fecha y hora Argentina.</p>
+      <select id="filtroGrupo" onchange="renderPartidos()">
+        <option value="TODOS">Todos los grupos</option>
+        <option value="A">Grupo A</option>
+        <option value="B">Grupo B</option>
+        <option value="C">Grupo C</option>
+        <option value="D">Grupo D</option>
+        <option value="E">Grupo E</option>
+        <option value="F">Grupo F</option>
+        <option value="G">Grupo G</option>
+        <option value="H">Grupo H</option>
+        <option value="I">Grupo I</option>
+        <option value="J">Grupo J</option>
+        <option value="K">Grupo K</option>
+        <option value="L">Grupo L</option>
+      </select>
+      <select id="filtroDia" onchange="renderPartidos()">
+        <option value="TODOS">Todos los días</option>
+      </select>
+
+<div id="partidos"></div>
+    </div>
+  </div>
+
+  <div id="viewRanking" class="hidden">
+    <div class="card">
+      <h2>Ranking general</h2>
+      <div id="ranking"></div>
+    </div>
+  </div>
+
+  <div id="viewComunidades" class="hidden">
+    <div class="card">
+      <h2>Mis comunidades</h2>
+      <p class="small">Podés participar en varias al mismo tiempo.</p>
+      <div id="comunidades"></div>
+    </div>
+
+    <div class="card">
+      <h3>Crear comunidad</h3>
+      <input id="nuevaComunidad" placeholder="Ej: Trabajo, Familia, Grupo de Amigos">
+      <select id="tipoComunidad">
+        <option>Empresa</option>
+        <option>Comercio</option>
+        <option>Emprendimiento</option>
+        <option>Grupo de amigos</option>
+        <option>Grupo familiar</option>
+        <option>Radio / Medio</option>
+        <option>Peña / Club</option>
+      </select>
+      <button onclick="crearComunidad()">Crear comunidad</button>
+    </div>
+
+    <div class="card invite">
+      <h3>Invitar a mi comunidad</h3>
+      <p class="small">Compartí el enlace para que se sumen a esa comunidad.</p>
+      <select id="selectInvitar"></select>
+      <button onclick="invitarComunidad()">📲 Invitar a esta comunidad</button>
+    </div>
+  </div>
+
+  <div id="viewPerfil" class="hidden">
+    <div class="card">
+      <h2>Mi perfil</h2>
+      <div id="perfilCompleto"></div>
+    </div>
+    <div class="card invite">
+      <p class="small">📲 Compartí Pronóstico de Fútbol con amigos, familiares y compañeros.</p>
+      <button onclick="invitarGeneral()">Compartir app</button>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div id="nav" class="bottomNav hidden">
+  <button id="navInicio" class="active" onclick="showView('inicio')"><span class="navIcon">🏠</span>Inicio</button>
+  <button id="navPartidos" onclick="showView('partidos')"><span class="navIcon">⚽</span>Partidos</button>
+  <button id="navRanking" onclick="showView('ranking')"><span class="navIcon">🏆</span>Ranking</button>
+  <button id="navComunidades" onclick="showView('comunidades')"><span class="navIcon">👥</span>Comunidades</button>
+  <button id="navPerfil" onclick="showView('perfil')"><span class="navIcon">👤</span>Perfil</button>
+</div>
+
+
+<div id="devOverlay" class="devOverlay">
+  <div class="devModal">
+    <h2>🔧 Herramientas de desarrollo</h2>
+    <p class="small">Este menú es oculto y sirve sólo para pruebas.</p>
+
+    <p class="devWarn">
+      Reiniciar la aplicación eliminará todos los datos guardados en este dispositivo:
+      perfil, pronósticos, comunidades, puntajes e insignias.
+    </p>
+
+    <button class="devDanger" onclick="confirmarReinicioDev()">Reiniciar aplicación</button>
+    <button class="secondary" onclick="cerrarDevModal()">Cancelar</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+</div>
+
+<script>
+const preguntasBase = [
+{p:"¿Quién fue el goleador del Mundial 2002?",o:["Ronaldo","Rivaldo","Klose","Batistuta"],r:"Ronaldo"},
+{p:"¿Qué selección eliminó a Argentina en el Mundial 2006?",o:["Alemania","Italia","Francia","Holanda"],r:"Alemania"},
+{p:"¿Quién ganó el Balón de Oro del Mundial 2014?",o:["Messi","Neuer","James Rodríguez","Müller"],r:"Messi"},
+{p:"¿Qué país fue campeón mundial en 1998?",o:["Francia","Brasil","Italia","Alemania"],r:"Francia"},
+{p:"¿Quién fue el goleador del Mundial 2014?",o:["James Rodríguez","Thomas Müller","Messi","Neymar"],r:"James Rodríguez"},
+{p:"¿Qué selección ganó el Mundial 1994 por penales?",o:["Brasil","Italia","Argentina","Alemania"],r:"Brasil"},
+{p:"¿Qué jugador erró el penal decisivo en la final del Mundial 1994?",o:["Roberto Baggio","Maldini","Baresi","Albertini"],r:"Roberto Baggio"},
+{p:"¿En qué Mundial debutó Lionel Messi?",o:["2006","2010","2002","2014"],r:"2006"},
+{p:"¿Qué país organizó el Mundial 2002 junto a Japón?",o:["Corea del Sur","China","Australia","Tailandia"],r:"Corea del Sur"},
+{p:"¿Qué selección ganó el Mundial 1966?",o:["Inglaterra","Alemania","Brasil","Italia"],r:"Inglaterra"},
+{p:"¿Quién hizo la 'Mano de Dios'?",o:["Diego Maradona","Pelé","Kempes","Caniggia"],r:"Diego Maradona"},
+{p:"¿Qué selección fue campeona en Sudáfrica 2010?",o:["España","Holanda","Alemania","Italia"],r:"España"},
+{p:"¿Quién convirtió el gol de la final 2010?",o:["Iniesta","Xavi","Villa","Torres"],r:"Iniesta"},
+{p:"¿Qué selección ganó el Mundial 2018?",o:["Francia","Croacia","Bélgica","Alemania"],r:"Francia"},
+{p:"¿Contra quién jugó Francia la final del Mundial 2018?",o:["Croacia","Argentina","Bélgica","Inglaterra"],r:"Croacia"},
+{p:"¿Qué selección ganó el Mundial 2006?",o:["Italia","Francia","Alemania","Brasil"],r:"Italia"},
+{p:"¿Contra quién jugó Italia la final del Mundial 2006?",o:["Francia","Alemania","Brasil","Portugal"],r:"Francia"},
+{p:"¿Quién fue expulsado en la final del Mundial 2006 por un cabezazo?",o:["Zidane","Materazzi","Henry","Vieira"],r:"Zidane"},
+{p:"¿Qué selección ganó el Mundial 1978?",o:["Argentina","Holanda","Brasil","Italia"],r:"Argentina"},
+{p:"¿Quién fue figura de Argentina en 1978?",o:["Mario Kempes","Maradona","Passarella","Fillol"],r:"Mario Kempes"},
+{p:"¿Qué país fue sede del Mundial 1986?",o:["México","Argentina","España","Italia"],r:"México"},
+{p:"¿Qué selección perdió la final de 1986 contra Argentina?",o:["Alemania Federal","Italia","Brasil","Francia"],r:"Alemania Federal"},
+{p:"¿Qué selección ganó el Mundial 1990?",o:["Alemania Federal","Argentina","Italia","Brasil"],r:"Alemania Federal"},
+{p:"¿Qué selección perdió la final del Mundial 1990?",o:["Argentina","Italia","Inglaterra","Holanda"],r:"Argentina"},
+{p:"¿En qué Mundial Argentina perdió 6-1 contra Checoslovaquia?",o:["1958","1962","1966","1974"],r:"1958"},
+{p:"¿Qué selección ganó el primer Mundial en 1930?",o:["Uruguay","Argentina","Brasil","Italia"],r:"Uruguay"},
+{p:"¿Dónde se jugó la primera final mundialista?",o:["Montevideo","Buenos Aires","Río de Janeiro","Roma"],r:"Montevideo"},
+{p:"¿Qué selección perdió la final del Mundial 1930?",o:["Argentina","Brasil","Uruguay","Chile"],r:"Argentina"},
+{p:"¿Qué jugador argentino fue goleador del Mundial 1978?",o:["Mario Kempes","Luque","Bertoni","Houseman"],r:"Mario Kempes"},
+{p:"¿Qué país fue campeón en 1950?",o:["Uruguay","Brasil","Italia","Alemania"],r:"Uruguay"},
+{p:"¿Cómo se conoce popularmente la derrota de Brasil ante Uruguay en 1950?",o:["Maracanazo","Mineirazo","Centenariazo","Aztecazo"],r:"Maracanazo"},
+{p:"¿Qué selección ganó el Mundial 1970?",o:["Brasil","Italia","Alemania","Uruguay"],r:"Brasil"},
+{p:"¿Qué jugador fue campeón mundial tres veces?",o:["Pelé","Maradona","Zidane","Ronaldo"],r:"Pelé"},
+{p:"¿Qué selección ganó el Mundial 1982?",o:["Italia","Alemania","Brasil","Argentina"],r:"Italia"},
+{p:"¿Qué selección ganó el Mundial 1974?",o:["Alemania Federal","Holanda","Brasil","Italia"],r:"Alemania Federal"},
+{p:"¿Qué país fue sede del Mundial 1982?",o:["España","Italia","México","Francia"],r:"España"},
+{p:"¿Qué país fue sede del Mundial 1990?",o:["Italia","Francia","Alemania","Estados Unidos"],r:"Italia"},
+{p:"¿Qué país fue sede del Mundial 1994?",o:["Estados Unidos","México","Francia","Brasil"],r:"Estados Unidos"},
+{p:"¿Qué país fue sede del Mundial 1998?",o:["Francia","Italia","Alemania","España"],r:"Francia"},
+{p:"¿Qué país fue sede del Mundial 2006?",o:["Alemania","Francia","Italia","Japón"],r:"Alemania"},
+{p:"¿Qué país fue sede del Mundial 2018?",o:["Rusia","Qatar","Brasil","Sudáfrica"],r:"Rusia"},
+{p:"¿Qué país fue sede del Mundial 2022?",o:["Qatar","Rusia","Brasil","Sudáfrica"],r:"Qatar"},
+{p:"¿Qué selección fue subcampeona en Qatar 2022?",o:["Francia","Croacia","Marruecos","Holanda"],r:"Francia"},
+{p:"¿Qué selección fue tercera en Qatar 2022?",o:["Croacia","Marruecos","Argentina","Francia"],r:"Croacia"},
+{p:"¿Qué selección africana llegó a semifinales en Qatar 2022?",o:["Marruecos","Senegal","Ghana","Camerún"],r:"Marruecos"},
+{p:"¿Quién fue el goleador del Mundial 2010?",o:["Thomas Müller","Forlán","Villa","Sneijder"],r:"Thomas Müller"},
+{p:"¿Quién fue el goleador del Mundial 2006?",o:["Miroslav Klose","Ronaldo","Henry","Crespo"],r:"Miroslav Klose"},
+{p:"¿Quién es el máximo goleador histórico de los mundiales?",o:["Miroslav Klose","Ronaldo","Gerd Müller","Messi"],r:"Miroslav Klose"},
+{p:"¿Qué arquero ganó el Guante de Oro en Qatar 2022?",o:["Emiliano Martínez","Lloris","Bono","Livakovic"],r:"Emiliano Martínez"},
+{p:"¿Qué jugador ganó el Botín de Oro en Qatar 2022?",o:["Mbappé","Messi","Giroud","Julián Álvarez"],r:"Mbappé"},
+{p:"¿Qué jugador ganó el Balón de Oro en Qatar 2022?",o:["Messi","Mbappé","Modric","Griezmann"],r:"Messi"},
+{p:"¿Contra qué selección debutó Argentina en Qatar 2022?",o:["Arabia Saudita","México","Polonia","Australia"],r:"Arabia Saudita"},
+{p:"¿Qué selección eliminó a Brasil en Qatar 2022?",o:["Croacia","Argentina","Francia","Holanda"],r:"Croacia"},
+{p:"¿Qué selección eliminó a Argentina en Rusia 2018?",o:["Francia","Croacia","Alemania","Nigeria"],r:"Francia"},
+{p:"¿Qué selección goleó 7-1 a Brasil en 2014?",o:["Alemania","Holanda","Argentina","Francia"],r:"Alemania"},
+{p:"¿Qué país fue campeón mundial en 2014?",o:["Alemania","Argentina","Brasil","Holanda"],r:"Alemania"},
+{p:"¿Contra quién jugó Argentina la final de 2014?",o:["Alemania","Brasil","Holanda","Francia"],r:"Alemania"},
+{p:"¿Quién hizo el gol de la final del Mundial 2014?",o:["Götze","Klose","Müller","Schürrle"],r:"Götze"},
+{p:"¿Qué selección eliminó a Argentina en Sudáfrica 2010?",o:["Alemania","España","Holanda","México"],r:"Alemania"},
+{p:"¿Qué selección fue subcampeona en 2010?",o:["Holanda","Alemania","Uruguay","Portugal"],r:"Holanda"},
+{p:"¿Qué selección fue cuarta en Sudáfrica 2010?",o:["Uruguay","Alemania","España","Holanda"],r:"Uruguay"}
+];
+
+const flag={
+"Mexico":"🇲🇽","South Africa":"🇿🇦","Korea Republic":"🇰🇷","Czechia":"🇨🇿",
+"Canada":"🇨🇦","Bosnia and Herzegovina":"🇧🇦","Qatar":"🇶🇦","Switzerland":"🇨🇭",
+"Brazil":"🇧🇷","Morocco":"🇲🇦","Haiti":"🇭🇹","Scotland":"🏴",
+"United States":"🇺🇸","Paraguay":"🇵🇾","Australia":"🇦🇺","Türkiye":"🇹🇷",
+"Germany":"🇩🇪","Curaçao":"🇨🇼","Ivory Coast":"🇨🇮","Ecuador":"🇪🇨",
+"Netherlands":"🇳🇱","Japan":"🇯🇵","Sweden":"🇸🇪","Tunisia":"🇹🇳",
+"Belgium":"🇧🇪","Egypt":"🇪🇬","IR Iran":"🇮🇷","New Zealand":"🇳🇿",
+"Spain":"🇪🇸","Cabo Verde":"🇨🇻","Saudi Arabia":"🇸🇦","Uruguay":"🇺🇾",
+"France":"🇫🇷","Senegal":"🇸🇳","Iraq":"🇮🇶","Norway":"🇳🇴",
+"Argentina":"🇦🇷","Algeria":"🇩🇿","Austria":"🇦🇹","Jordan":"🇯🇴",
+"Portugal":"🇵🇹","DR Congo":"🇨🇩","Uzbekistan":"🇺🇿","Colombia":"🇨🇴",
+"England":"🏴","Croatia":"🇭🇷","Ghana":"🇬🇭","Panama":"🇵🇦"
+};
+
+const fixture=[
+{g:"A",d:"2026-06-11",h:"16:00",l:"Mexico",v:"South Africa"},
+{g:"A",d:"2026-06-11",h:"23:00",l:"Korea Republic",v:"Czechia"},
+{g:"A",d:"2026-06-18",h:"13:00",l:"Czechia",v:"South Africa"},
+{g:"A",d:"2026-06-18",h:"22:00",l:"Mexico",v:"Korea Republic"},
+{g:"A",d:"2026-06-24",h:"22:00",l:"South Africa",v:"Korea Republic"},
+{g:"A",d:"2026-06-24",h:"22:00",l:"Czechia",v:"Mexico"},
+
+{g:"B",d:"2026-06-12",h:"16:00",l:"Canada",v:"Bosnia and Herzegovina"},
+{g:"B",d:"2026-06-13",h:"16:00",l:"Qatar",v:"Switzerland"},
+{g:"B",d:"2026-06-18",h:"16:00",l:"Switzerland",v:"Bosnia and Herzegovina"},
+{g:"B",d:"2026-06-18",h:"19:00",l:"Canada",v:"Qatar"},
+{g:"B",d:"2026-06-24",h:"16:00",l:"Switzerland",v:"Canada"},
+{g:"B",d:"2026-06-24",h:"16:00",l:"Bosnia and Herzegovina",v:"Qatar"},
+
+{g:"C",d:"2026-06-13",h:"19:00",l:"Brazil",v:"Morocco"},
+{g:"C",d:"2026-06-13",h:"22:00",l:"Haiti",v:"Scotland"},
+{g:"C",d:"2026-06-19",h:"19:00",l:"Scotland",v:"Morocco"},
+{g:"C",d:"2026-06-19",h:"22:00",l:"Brazil",v:"Haiti"},
+{g:"C",d:"2026-06-24",h:"19:00",l:"Scotland",v:"Brazil"},
+{g:"C",d:"2026-06-24",h:"19:00",l:"Morocco",v:"Haiti"},
+
+{g:"D",d:"2026-06-12",h:"22:00",l:"United States",v:"Paraguay"},
+{g:"D",d:"2026-06-14",h:"01:00",l:"Australia",v:"Türkiye"},
+{g:"D",d:"2026-06-19",h:"16:00",l:"United States",v:"Australia"},
+{g:"D",d:"2026-06-20",h:"01:00",l:"Türkiye",v:"Paraguay"},
+{g:"D",d:"2026-06-25",h:"23:00",l:"Türkiye",v:"United States"},
+{g:"D",d:"2026-06-25",h:"23:00",l:"Paraguay",v:"Australia"},
+
+{g:"E",d:"2026-06-14",h:"14:00",l:"Germany",v:"Curaçao"},
+{g:"E",d:"2026-06-14",h:"20:00",l:"Ivory Coast",v:"Ecuador"},
+{g:"E",d:"2026-06-20",h:"17:00",l:"Germany",v:"Ivory Coast"},
+{g:"E",d:"2026-06-20",h:"21:00",l:"Ecuador",v:"Curaçao"},
+{g:"E",d:"2026-06-25",h:"16:00",l:"Curaçao",v:"Ivory Coast"},
+{g:"E",d:"2026-06-25",h:"17:00",l:"Ecuador",v:"Germany"},
+
+{g:"F",d:"2026-06-14",h:"17:00",l:"Netherlands",v:"Japan"},
+{g:"F",d:"2026-06-14",h:"23:00",l:"Sweden",v:"Tunisia"},
+{g:"F",d:"2026-06-20",h:"14:00",l:"Netherlands",v:"Sweden"},
+{g:"F",d:"2026-06-21",h:"01:00",l:"Tunisia",v:"Japan"},
+{g:"F",d:"2026-06-25",h:"20:00",l:"Tunisia",v:"Netherlands"},
+{g:"F",d:"2026-06-25",h:"20:00",l:"Japan",v:"Sweden"},
+
+{g:"G",d:"2026-06-15",h:"16:00",l:"Belgium",v:"Egypt"},
+{g:"G",d:"2026-06-15",h:"22:00",l:"IR Iran",v:"New Zealand"},
+{g:"G",d:"2026-06-21",h:"16:00",l:"Belgium",v:"IR Iran"},
+{g:"G",d:"2026-06-21",h:"22:00",l:"New Zealand",v:"Egypt"},
+{g:"G",d:"2026-06-27",h:"00:00",l:"New Zealand",v:"Belgium"},
+{g:"G",d:"2026-06-27",h:"00:00",l:"Egypt",v:"IR Iran"},
+
+{g:"H",d:"2026-06-15",h:"13:00",l:"Spain",v:"Cabo Verde"},
+{g:"H",d:"2026-06-15",h:"19:00",l:"Saudi Arabia",v:"Uruguay"},
+{g:"H",d:"2026-06-21",h:"13:00",l:"Spain",v:"Saudi Arabia"},
+{g:"H",d:"2026-06-21",h:"19:00",l:"Uruguay",v:"Cabo Verde"},
+{g:"H",d:"2026-06-26",h:"21:00",l:"Saudi Arabia",v:"Cabo Verde"},
+{g:"H",d:"2026-06-26",h:"21:00",l:"Uruguay",v:"Spain"},
+
+{g:"I",d:"2026-06-16",h:"16:00",l:"France",v:"Senegal"},
+{g:"I",d:"2026-06-16",h:"19:00",l:"Iraq",v:"Norway"},
+{g:"I",d:"2026-06-22",h:"18:00",l:"France",v:"Iraq"},
+{g:"I",d:"2026-06-22",h:"21:00",l:"Senegal",v:"Norway"},
+{g:"I",d:"2026-06-26",h:"16:00",l:"Senegal",v:"Iraq"},
+{g:"I",d:"2026-06-26",h:"16:00",l:"Norway",v:"France"},
+
+{g:"J",d:"2026-06-16",h:"22:00",l:"Argentina",v:"Algeria"},
+{g:"J",d:"2026-06-17",h:"01:00",l:"Austria",v:"Jordan"},
+{g:"J",d:"2026-06-22",h:"14:00",l:"Argentina",v:"Austria"},
+{g:"J",d:"2026-06-23",h:"00:00",l:"Algeria",v:"Jordan"},
+{g:"J",d:"2026-06-27",h:"23:00",l:"Algeria",v:"Austria"},
+{g:"J",d:"2026-06-27",h:"23:00",l:"Argentina",v:"Jordan"},
+
+{g:"K",d:"2026-06-17",h:"14:00",l:"Portugal",v:"DR Congo"},
+{g:"K",d:"2026-06-17",h:"23:00",l:"Uzbekistan",v:"Colombia"},
+{g:"K",d:"2026-06-23",h:"14:00",l:"Portugal",v:"Uzbekistan"},
+{g:"K",d:"2026-06-23",h:"23:00",l:"DR Congo",v:"Colombia"},
+{g:"K",d:"2026-06-27",h:"20:30",l:"Colombia",v:"Portugal"},
+{g:"K",d:"2026-06-27",h:"20:30",l:"DR Congo",v:"Uzbekistan"},
+
+{g:"L",d:"2026-06-17",h:"17:00",l:"England",v:"Croatia"},
+{g:"L",d:"2026-06-17",h:"20:00",l:"Ghana",v:"Panama"},
+{g:"L",d:"2026-06-23",h:"17:00",l:"England",v:"Ghana"},
+{g:"L",d:"2026-06-23",h:"20:00",l:"Croatia",v:"Panama"},
+{g:"L",d:"2026-06-27",h:"18:00",l:"England",v:"Panama"},
+{g:"L",d:"2026-06-27",h:"18:00",l:"Croatia",v:"Ghana"}
+].map((p,i)=>({...p,id:i+1}));
+
+function guardar(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function leer(k,d){return JSON.parse(localStorage.getItem(k))||d}
+
+let usuario=leer("usuario",null);
+let comunidades=leer("comunidades",[]);
+let pronosticos=leer("pronosticos",{});
+let puntos=leer("puntos",0);
+
+window.onload=function(){
+ revisarInvitacion();
+ if(usuario) mostrarHome();
+}
+
+function revisarInvitacion(){
+ const p=new URLSearchParams(location.search);
+ const comunidad=p.get("comunidad");
+ const tipo=p.get("tipo");
+ if(comunidad) guardar("invitacionPendiente",{nombre:comunidad,tipo:tipo||"Grupo de amigos"});
+}
+
+function toastMsg(msg){
+ toast.innerText=msg;
+ toast.style.display="block";
+ setTimeout(()=>toast.style.display="none",2600);
+}
+
+function hideAll(){
+ ["welcome","juegoResponsable","registro","examen","resultadoExamen","home"].forEach(id=>document.getElementById(id).classList.add("hidden"));
+}
+
+
+function goJuegoResponsable(){
+ if(usuario){mostrarHome();return}
+ hideAll();
+ juegoResponsable.classList.remove("hidden");
+ if(document.getElementById("checkResponsable")){
+  checkResponsable.checked=false;
+  validarResponsable();
+ }
+}
+
+function validarResponsable(){
+ const activo = document.getElementById("checkResponsable")?.checked;
+ if(activo){
+  btnContinuarResponsable.classList.remove("disabledBtn");
+ }else{
+  btnContinuarResponsable.classList.add("disabledBtn");
+ }
+}
+
+function continuarRegistro(){
+ if(!checkResponsable.checked){
+  alert("Para continuar, primero tenés que confirmar que leíste la información.");
+  return;
+ }
+ goRegistro();
+}
+
+function goRegistro(){
+ if(usuario){mostrarHome();return}
+ hideAll();
+ registro.classList.remove("hidden");
+}
+
+function volverWelcome(){hideAll();welcome.classList.remove("hidden")}
+
+function crearPerfil(){
+ const n=nombre.value.trim();
+ const a=apellido.value.trim();
+ if(!n||!a){alert("Completá nombre y apellido.");return}
+ usuario={id:"U"+Date.now(),nombre:n,apellido:a,edad:edad.value,ciudad:ciudad.value,hincha:hincha.value,insignia:"Sin insignia"};
+ guardar("usuario",usuario);
+ cargarPreguntas();
+ hideAll();
+ examen.classList.remove("hidden");
+}
+
+function cargarPreguntas(){
+ let elegidas = preguntasBase
+   .map(p => ({...p, orden: Math.random()}))
+   .sort((a,b) => a.orden - b.orden)
+   .slice(0,5);
+
+ guardar("preguntasActuales",elegidas);
+ preguntas.innerHTML="";
+
+ elegidas.forEach((q,i)=>{
+  const opcionesMezcladas = [...q.o].sort(()=>Math.random()-.5);
+
+  preguntas.innerHTML+=`
+  <div class="match">
+    <b>${i+1}. ${q.p}</b>
+    ${opcionesMezcladas.map(op=>`
+    <label class="option">
+      <span>${op}</span>
+      <input type="radio" name="q${i}" value="${op}">
+    </label>`).join("")}
+  </div>`;
+ });
+}
+
+function finalizarExamen(){
+ const qs=leer("preguntasActuales",[]);
+ let correctas=0;
+ let respondidas=0;
+
+ qs.forEach((q,i)=>{
+  const marcada=document.querySelector(`input[name="q${i}"]:checked`);
+  if(marcada){
+   respondidas++;
+   if(marcada.value===q.r) correctas++;
+  }
+ });
+
+ const incorrectas = qs.length - correctas;
+
+ let insignia="😂 Chamuyero del fútbol";
+ let mensaje="Arrancaste flojo, pero todavía podés redimirte en la cancha del prode.";
+ if(correctas===5){
+  insignia="🏆 Experto Mundialista";
+  mensaje="Perfecto. Entraste como candidato serio al ranking.";
+ }else if(correctas===4){
+  insignia="🥇 Conocedor";
+  mensaje="Muy bien. Se nota que no mirás fútbol sólo por los memes.";
+ }else if(correctas===3){
+  insignia="⚽ Aficionado";
+  mensaje="Bien. Tenés base, pero todavía hay margen para cerrar algunos bares deportivos.";
+ }else if(correctas===2){
+  insignia="🍻 Tribunero";
+  mensaje="Sabés algo, opinás bastante. Perfil clásico de previa mundialista.";
+ }
+
+ usuario.insignia=insignia;
+ usuario.examenCorrectas=correctas;
+ usuario.examenIncorrectas=incorrectas;
+ usuario.examenRespondidas=respondidas;
+ guardar("usuario",usuario);
+
+ const inv=leer("invitacionPendiente",null);
+ if(inv){
+  agregarComunidad(inv.nombre,inv.tipo);
+  localStorage.removeItem("invitacionPendiente");
+ }
+
+ resultadoPuntaje.innerText = `${correctas}/5`;
+ resultadoDetalle.innerHTML = `
+  <p><span class="resultGood">Correctas:</span> ${correctas}</p>
+  <p><span class="resultBad">Incorrectas:</span> ${incorrectas}</p>
+ `;
+ resultadoInsignia.innerText = insignia;
+ resultadoMensaje.innerText = mensaje;
+
+ hideAll();
+ resultadoExamen.classList.remove("hidden");
+}
+
+function entrarDespuesDelExamen(){
+ mostrarHome();
+}
+
+function mostrarHome(){
+ hideAll();
+ home.classList.remove("hidden");
+ nav.classList.remove("hidden");
+ saludo.innerText=`Hola, ${usuario.nombre}`;
+ insignia.innerText=usuario.insignia;
+ perfilDato.innerText=`${usuario.ciudad||"Ciudad no informada"} · Hincha de ${usuario.hincha||"equipo no informado"}`;
+ puntosHome.innerText=puntos;
+ renderPartidos();
+ renderComunidades();
+ renderRanking();
+ renderPerfil();
+ actualizarSelectInvitar();
+ showView("inicio");
+}
+
+function showView(view){
+ ["Inicio","Partidos","Ranking","Comunidades","Perfil"].forEach(v=>{
+  document.getElementById("view"+v).classList.add("hidden");
+  document.getElementById("nav"+v).classList.remove("active");
+ });
+ const id=view.charAt(0).toUpperCase()+view.slice(1);
+ document.getElementById("view"+id).classList.remove("hidden");
+ document.getElementById("nav"+id).classList.add("active");
+
+ if(view==="partidos"){
+  cargarFiltroDias();
+  renderPartidos();
+ }
+
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function bandera(nombre){
+ const codigos = {
+  "Mexico":"mx",
+  "South Africa":"za",
+  "Korea Republic":"kr",
+  "Czechia":"cz",
+  "Canada":"ca",
+  "Bosnia and Herzegovina":"ba",
+  "Qatar":"qa",
+  "Switzerland":"ch",
+  "Brazil":"br",
+  "Morocco":"ma",
+  "Haiti":"ht",
+  "Scotland":"gb-sct",
+  "United States":"us",
+  "Paraguay":"py",
+  "Australia":"au",
+  "Türkiye":"tr",
+  "Germany":"de",
+  "Curaçao":"cw",
+  "Ivory Coast":"ci",
+  "Ecuador":"ec",
+  "Netherlands":"nl",
+  "Japan":"jp",
+  "Sweden":"se",
+  "Tunisia":"tn",
+  "Belgium":"be",
+  "Egypt":"eg",
+  "IR Iran":"ir",
+  "New Zealand":"nz",
+  "Spain":"es",
+  "Cabo Verde":"cv",
+  "Saudi Arabia":"sa",
+  "Uruguay":"uy",
+  "France":"fr",
+  "Senegal":"sn",
+  "Iraq":"iq",
+  "Norway":"no",
+  "Argentina":"ar",
+  "Algeria":"dz",
+  "Austria":"at",
+  "Jordan":"jo",
+  "Portugal":"pt",
+  "DR Congo":"cd",
+  "Uzbekistan":"uz",
+  "Colombia":"co",
+  "England":"gb-eng",
+  "Croatia":"hr",
+  "Ghana":"gh",
+  "Panama":"pa"
+ };
+
+ const codigo = codigos[nombre];
+
+ if(!codigo){
+  return `<span style="display:inline-block;width:28px">🏳️</span>`;
+ }
+
+ return `<img 
+  src="https://flagcdn.com/w40/${codigo}.png" 
+  alt="${nombre}" 
+  style="width:28px;height:20px;object-fit:cover;border-radius:3px;vertical-align:middle;margin-right:5px;"
+ >`;
+}
+
+
+function cargarFiltroDias(){
+ const select = document.getElementById("filtroDia");
+ if(!select) return;
+
+ const valorActual = select.value || "TODOS";
+ const fechas = [...new Set(fixture.map(p=>p.d))].sort();
+
+ select.innerHTML = `<option value="TODOS">Todos los días</option>`;
+
+ fechas.forEach(fecha=>{
+  select.innerHTML += `<option value="${fecha}">${formatearFecha(fecha)}</option>`;
+ });
+
+ if([...select.options].some(o=>o.value===valorActual)){
+  select.value = valorActual;
+ }else{
+  select.value = "TODOS";
+ }
+}
+
+function renderPartidos(){
+ const filtro=filtroGrupo.value;
+ const dia=(document.getElementById("filtroDia")?.value)||"TODOS";
+
+ const lista=fixture.filter(p=>{
+  const coincideGrupo = filtro==="TODOS" || p.g===filtro;
+  const coincideDia = dia==="TODOS" || p.d===dia;
+  return coincideGrupo && coincideDia;
+ });
+
+ const grupos=[...new Set(lista.map(p=>p.g))];
+ let html="";
+
+ if(lista.length===0){
+  partidos.innerHTML=`<p class="small">No hay partidos para el filtro seleccionado.</p>`;
+  return;
+ }
+
+ grupos.forEach(g=>{
+  const delGrupo=lista.filter(p=>p.g===g);
+  html+=`<div class="groupBlock"><div class="groupTitle">Grupo ${g}</div>`;
+  const fechas=[...new Set(delGrupo.map(p=>p.d))];
+
+  fechas.forEach(fecha=>{
+   const delDia=delGrupo.filter(p=>p.d===fecha);
+   html+=`<div class="dayTitle">📅 ${formatearFecha(fecha)}</div>`;
+
+   delDia.forEach(p=>{
+    const pr=pronosticos[p.id]||{};
+    const simultaneos=delDia.filter(x=>x.h===p.h).length>1;
+    const cerrado=partidoCerrado(p.d,p.h);
+    const cierre=horaCierre(p.h);
+
+    html+=`
+    <div class="match">
+      <div class="matchHeader">
+        <span class="groupTag">Grupo ${p.g}</span>
+        <span class="timeTag">🕘 ${p.h} hs Argentina</span>
+      </div>
+
+      ${simultaneos?`<div class="simultaneo">⚠ Partido simultáneo</div>`:""}
+
+      <div class="small" style="margin-bottom:8px;color:${cerrado ? '#ff7979' : '#56ff33'}">
+        ${cerrado 
+          ? "🔒 Pronóstico cerrado" 
+          : "📝 Podés cargar o modificar hasta las " + cierre + " hs Argentina"}
+      </div>
+
+      <div class="teams">
+        <span class="team">${bandera(p.l)} ${p.l}</span>
+        <span class="vs">VS</span>
+        <span class="team" style="text-align:right">${p.v} ${bandera(p.v)}</span>
+      </div>
+
+      <div class="score">
+        <input id="l${p.id}" type="number" value="${pr.local??""}" placeholder="0" ${cerrado?"disabled":""}>
+        <span>-</span>
+        <input id="v${p.id}" type="number" value="${pr.visitante??""}" placeholder="0" ${cerrado?"disabled":""}>
+      </div>
+
+      <button onclick="guardarPronostico(${p.id})" ${cerrado?'style="opacity:.45;pointer-events:none"':""}>
+        ${cerrado ? "Pronóstico cerrado" : "Guardar pronóstico"}
+      </button>
+    </div>`;
+   });
+  });
+
+  html+=`</div>`;
+ });
+
+ partidos.innerHTML=html;
+}
+
+
+function guardarPronostico(id){
+ const l=document.getElementById("l"+id).value;
+ const v=document.getElementById("v"+id).value;
+
+ if(l==="" || v===""){
+  alert("Cargá los dos resultados.");
+  return;
+ }
+
+ const partido=fixture.find(p=>p.id===id);
+
+ if(partido && partidoCerrado(partido.d,partido.h)){
+  alert("Este pronóstico ya está cerrado.");
+  return;
+ }
+
+ pronosticos[id]={local:l,visitante:v};
+ guardar("pronosticos",pronosticos);
+
+ puntos=Object.keys(pronosticos).length*3;
+ guardar("puntos",puntos);
+
+ toastMsg("Pronóstico guardado. Sumás en todos tus rankings.");
+ mostrarHome();
+ showView("partidos");
+}
+
+function horaCierre(hora){
+ const [hh,mm]=hora.split(":").map(Number);
+ const cierre=new Date(2026,0,1,hh,mm,0);
+ cierre.setHours(cierre.getHours()-1);
+ return String(cierre.getHours()).padStart(2,"0") + ":" + String(cierre.getMinutes()).padStart(2,"0");
+}
+
+function partidoCerrado(fecha,hora){
+ const ahora=new Date();
+
+ const [y,m,d]=fecha.split("-").map(Number);
+ const [hh,mm]=hora.split(":").map(Number);
+
+ const cierre=new Date(y,m-1,d,hh,mm,0);
+ cierre.setHours(cierre.getHours()-1);
+
+ return ahora>=cierre;
+}
+
+function crearComunidad(){
+ const nombre=nuevaComunidad.value.trim();
+ const tipo=tipoComunidad.value;
+ if(!nombre){alert("Escribí el nombre de la comunidad.");return}
+ agregarComunidad(nombre,tipo);
+ nuevaComunidad.value="";
+ renderComunidades();
+ actualizarSelectInvitar();
+ toastMsg("Comunidad creada. Ya podés invitar participantes.");
+}
+
+function agregarComunidad(nombre,tipo){
+ if(!comunidades.find(c=>c.nombre.toLowerCase()===nombre.toLowerCase())){
+  comunidades.push({id:"C"+Date.now(),nombre,tipo});
+  guardar("comunidades",comunidades);
+ }
+}
+
+function renderComunidades(){
+ if(comunidades.length===0){
+  comunidades.innerHTML=`<p class="small">Todavía no pertenecés a ninguna comunidad.</p>`;
+  return;
+ }
+ comunidades.innerHTML=comunidades.map(c=>`
+ <div class="row">
+  <span>${icono(c.tipo)} <b>${c.nombre}</b><br><small>${c.tipo}</small></span>
+  <button style="width:auto;padding:8px 10px;font-size:12px;border-radius:12px" onclick="invitarNombre('${encodeURIComponent(c.nombre)}','${encodeURIComponent(c.tipo)}')">Invitar</button>
+ </div>`).join("");
+}
+
+function actualizarSelectInvitar(){
+ if(comunidades.length===0){
+  selectInvitar.innerHTML=`<option value="">Primero creá una comunidad</option>`;
+  return;
+ }
+ selectInvitar.innerHTML=comunidades.map((c,i)=>`<option value="${i}">${c.nombre} - ${c.tipo}</option>`).join("");
+}
+
+function invitarComunidad(){
+ if(comunidades.length===0){alert("Primero creá una comunidad.");return}
+ const c=comunidades[selectInvitar.value];
+ invitarNombre(encodeURIComponent(c.nombre),encodeURIComponent(c.tipo));
+}
+
+function invitarNombre(nombreCod,tipoCod){
+ const nombre=decodeURIComponent(nombreCod);
+ const tipo=decodeURIComponent(tipoCod);
+ const base=location.href.split("?")[0];
+ const link=`${base}?comunidad=${encodeURIComponent(nombre)}&tipo=${encodeURIComponent(tipo)}`;
+ const texto=`Te invito a jugar en Pronóstico de Fútbol dentro de "${nombre}". Entrá, creá tu perfil y competí con nosotros: ${link}`;
+ compartir(texto);
+}
+
+function invitarGeneral(){
+ const base=location.href.split("?")[0];
+ const texto=`Sumate a Pronóstico de Fútbol. Demostrá que sos vos el que más sabe: ${base}`;
+ compartir(texto);
+}
+
+function compartir(texto){
+ if(navigator.share){
+  navigator.share({title:"Pronóstico de Fútbol",text:texto}).catch(()=>{});
+ }else{
+  window.open("https://wa.me/?text="+encodeURIComponent(texto),"_blank");
+ }
+}
+
+function renderRanking(){
+ const org=comunidades[0]?.nombre||"Individual";
+ const html=`
+ <div class="row">
+  <span>1. <b>${usuario.nombre} ${usuario.apellido}</b><br><small>${org}</small></span>
+  <b>${puntos} pts</b>
+ </div>`;
+ ranking.innerHTML=html;
+ rankingInicio.innerHTML=html;
+}
+
+function renderPerfil(){
+ perfilCompleto.innerHTML=`
+ <div class="badge">${usuario.insignia}</div>
+ <div class="row"><span>Nombre</span><b>${usuario.nombre} ${usuario.apellido}</b></div>
+ <div class="row"><span>Edad</span><b>${usuario.edad||"-"}</b></div>
+ <div class="row"><span>Ciudad</span><b>${usuario.ciudad||"-"}</b></div>
+ <div class="row"><span>Hincha de</span><b>${usuario.hincha||"-"}</b></div>
+ <div class="row"><span>Puntos</span><b>${puntos}</b></div>
+ <div class="row"><span>Comunidades</span><b>${comunidades.length}</b></div>`;
+}
+
+
+
+function formatearFecha(fecha){
+ const [y,m,d]=fecha.split("-");
+ const dias=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+ const meses=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+ const dt=new Date(Number(y),Number(m)-1,Number(d));
+ return `${dias[dt.getDay()]} ${Number(d)} de ${meses[Number(m)-1]}`;
+}
+
+function icono(tipo){
+ if(tipo==="Empresa")return"🏢";
+ if(tipo==="Comercio")return"🏪";
+ if(tipo==="Emprendimiento")return"🧰";
+ if(tipo==="Grupo de amigos")return"👥";
+ if(tipo==="Grupo familiar")return"👨‍👩‍👧‍👦";
+ if(tipo==="Radio / Medio")return"📻";
+ if(tipo==="Peña / Club")return"⚽";
+ return"👤";
+}
+
+
+let devLogoTimer=null;
+
+function devLogoDown(){
+ devLogoTimer=setTimeout(()=>{
+  abrirDevModal();
+ },5000);
+}
+
+function devLogoUp(){
+ if(devLogoTimer){
+  clearTimeout(devLogoTimer);
+  devLogoTimer=null;
+ }
+}
+
+function abrirDevModal(){
+ devLogoUp();
+ devOverlay.style.display="flex";
+}
+
+function cerrarDevModal(){
+ devOverlay.style.display="none";
+}
+
+function confirmarReinicioDev(){
+ const ok=confirm("¿Seguro que querés reiniciar la aplicación? Se borrarán todos los datos locales de este dispositivo.");
+ if(ok){
+  localStorage.clear();
+  location.href=location.href.split("?")[0];
+ }
+}
+
+function reiniciar(){
+ if(confirm("¿Borrar todos los datos de esta prueba?")){
+  localStorage.clear();
+  location.href=location.href.split("?")[0];
+ }
+}
+</script>
+</body>
+</html>
