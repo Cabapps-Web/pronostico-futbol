@@ -258,6 +258,7 @@ button.disabledBtn{
     <p class="small">Tu perfil queda guardado en este celular.</p>
     <input id="nombre" placeholder="Nombre">
     <input id="apellido" placeholder="Apellido">
+    <input id="dni" inputmode="numeric" maxlength="8" placeholder="DNI sin puntos ni espacios">
     <input id="edad" type="number" placeholder="Edad">
     <input id="ciudad" placeholder="Ciudad">
     <input id="hincha" placeholder="Hincha de...">
@@ -666,6 +667,7 @@ async function guardarUsuarioOnline(){
    id:usuario.id,
    nombre:usuario.nombre || "",
    apellido:usuario.apellido || "",
+   dni:usuario.dni || "",
    nombreCompleto:`${usuario.nombre || ""} ${usuario.apellido || ""}`.trim(),
    edad:usuario.edad || "",
    ciudad:usuario.ciudad || "",
@@ -757,13 +759,84 @@ function goRegistro(){
 
 function volverWelcome(){hideAll();welcome.classList.remove("hidden")}
 
-function crearPerfil(){
+
+function limpiarDni(valor){
+ return String(valor || "").replace(/\D/g,"");
+}
+
+function dniValido(valor){
+ return /^[0-9]{7,8}$/.test(limpiarDni(valor));
+}
+
+async function buscarUsuarioPorDni(dniLimpio){
+ try{
+  const snap=await db.collection("usuarios").where("dni","==",dniLimpio).limit(1).get();
+  if(snap.empty) return null;
+  const doc=snap.docs[0];
+  return {docId:doc.id,...doc.data()};
+ }catch(e){
+  console.error("Error buscando DNI:",e);
+  return null;
+ }
+}
+
+function cargarUsuarioExistente(u){
+ usuario={
+  id:u.id || u.docId,
+  nombre:u.nombre || "",
+  apellido:u.apellido || "",
+  dni:u.dni || "",
+  edad:u.edad || "",
+  ciudad:u.ciudad || "",
+  hincha:u.hincha || "",
+  insignia:u.insignia || "Sin insignia"
+ };
+ comunidades=u.comunidades || [];
+ puntos=u.puntos || 0;
+
+ guardar("usuario",usuario);
+ guardar("comunidades",comunidades);
+ guardar("puntos",puntos);
+}
+
+
+async function crearPerfil(){
  const n=nombre.value.trim();
  const a=apellido.value.trim();
- if(!n||!a){alert("Completá nombre y apellido.");return}
- usuario={id:"U"+Date.now(),nombre:n,apellido:a,edad:edad.value,ciudad:ciudad.value,hincha:hincha.value,insignia:"Sin insignia"};
+ const d=limpiarDni(dni.value);
+
+ if(!n||!a){
+  alert("Completá nombre y apellido.");
+  return;
+ }
+
+ if(!dniValido(d)){
+  alert("Ingresá un DNI válido, sólo números, sin puntos ni espacios.");
+  return;
+ }
+
+ const existente=await buscarUsuarioPorDni(d);
+
+ if(existente){
+  alert("Este DNI ya está registrado. Se cargará el perfil existente para evitar duplicados.");
+  cargarUsuarioExistente(existente);
+  mostrarHome();
+  return;
+ }
+
+ usuario={
+  id:"DNI"+d,
+  nombre:n,
+  apellido:a,
+  dni:d,
+  edad:edad.value,
+  ciudad:ciudad.value,
+  hincha:hincha.value,
+  insignia:"Sin insignia"
+ };
+
  guardar("usuario",usuario);
- guardarUsuarioOnline();
+ await guardarUsuarioOnline();
  cargarPreguntas();
  hideAll();
  examen.classList.remove("hidden");
