@@ -13,15 +13,6 @@ body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#020814;color:#f
 .hidden{display:none!important}
 
 .logo{display:block;width:88px;margin:14px auto 7px;filter:drop-shadow(0 0 18px #57ff39)}
-
-.logo,
-.topbar img{
-  user-select:none;
-  -webkit-user-select:none;
-  -webkit-touch-callout:none;
-  touch-action:none;
-}
-
 .brand{text-align:center;font-size:28px;font-weight:900;line-height:1;margin:0}
 .brand span{color:#56ff33}
 .slogan{text-align:center;margin:8px 0 14px;color:#d7e7ff;font-weight:bold;font-size:14px}
@@ -187,7 +178,7 @@ button.disabledBtn{
 <div class="screen">
 
 <section id="welcome">
-  <img class="logo" src="logo.png" alt="Logo" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;">
+  <img class="logo" src="logo.png" alt="Logo" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()">
   <h1 class="brand">PRONÓSTICO <span>DE FÚTBOL</span></h1>
   <p class="slogan">Demostrá que sos vos el que más sabe.</p>
 
@@ -204,7 +195,7 @@ button.disabledBtn{
 
 
 <section id="juegoResponsable" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
 
   <div class="card responsableBox">
     <div class="responsableIcon">⚠️</div>
@@ -236,7 +227,7 @@ button.disabledBtn{
 </section>
 
 <section id="registro" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
   <div class="card">
     <h2>Crear perfil</h2>
     <p class="small">Tu perfil queda guardado en este celular.</p>
@@ -251,7 +242,7 @@ button.disabledBtn{
 </section>
 
 <section id="examen" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
   <div class="card">
     <h2>Veamos Cuanto Sabés</h2>
     <p class="small">Respondé 5 preguntas y ganá tu primera insignia.</p>
@@ -262,7 +253,7 @@ button.disabledBtn{
 
 
 <section id="resultadoExamen" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
   <div class="card">
     <div class="resultBox">
       <h2>Resultado del desafío</h2>
@@ -277,14 +268,14 @@ button.disabledBtn{
 </section>
 
 <section id="home" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
 
   <div id="viewInicio">
     <div class="card">
       <h2 id="saludo"></h2>
       <div id="insignia" class="badge"></div>
       <p id="perfilDato" class="small"></p>
-      <div class="row"><span>Mi posición general</span><b>1°</b></div>
+      <div class="row"><span>Mi posición general</span><b id="posicionHome">Sin clasificar</b></div>
       <div class="row"><span>Mis puntos</span><b><span id="puntosHome">0</span> pts</b></div>
     </div>
 
@@ -411,7 +402,22 @@ button.disabledBtn{
 <div id="toast" class="toast"></div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCcBxyUP8jevSfF2v1Jw1E3YFE66azYHA",
+  authDomain: "pronostico-futbol-74006.firebaseapp.com",
+  projectId: "pronostico-futbol-74006",
+  storageBucket: "pronostico-futbol-74006.firebasestorage.app",
+  messagingSenderId: "759318573567",
+  appId: "1:759318573567:web:2a4e813cfaaa08405137ca"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 const preguntasBase = [
 {p:"¿Quién fue el goleador del Mundial 2002?",o:["Ronaldo","Rivaldo","Klose","Batistuta"],r:"Ronaldo"},
 {p:"¿Qué selección eliminó a Argentina en el Mundial 2006?",o:["Alemania","Italia","Francia","Holanda"],r:"Alemania"},
@@ -584,6 +590,49 @@ let usuario=leer("usuario",null);
 let comunidades=leer("comunidades",[]);
 let pronosticos=leer("pronosticos",{});
 let puntos=leer("puntos",0);
+let firebaseDisponible=true;
+
+async function guardarUsuarioOnline(){
+ if(!usuario) return;
+
+ try{
+  const ref=db.collection("usuarios").doc(usuario.id);
+  await ref.set({
+   id:usuario.id,
+   nombre:usuario.nombre || "",
+   apellido:usuario.apellido || "",
+   nombreCompleto:`${usuario.nombre || ""} ${usuario.apellido || ""}`.trim(),
+   edad:usuario.edad || "",
+   ciudad:usuario.ciudad || "",
+   hincha:usuario.hincha || "",
+   insignia:usuario.insignia || "Sin insignia",
+   puntos:puntos || 0,
+   comunidades:comunidades || [],
+   cantidadComunidades:(comunidades || []).length,
+   actualizadoEn:firebase.firestore.FieldValue.serverTimestamp()
+  },{merge:true});
+ }catch(e){
+  firebaseDisponible=false;
+  console.error("Error guardando usuario online:",e);
+ }
+}
+
+async function obtenerUsuariosOnline(){
+ try{
+  const snap=await db.collection("usuarios").orderBy("puntos","desc").get();
+  return snap.docs.map(doc=>doc.data());
+ }catch(e){
+  firebaseDisponible=false;
+  console.error("Error leyendo usuarios online:",e);
+  return null;
+ }
+}
+
+function nombreRanking(u){
+ const nombre=(u.nombre || "").trim();
+ const apellido=(u.apellido || "").trim();
+ return `${nombre} ${apellido}`.trim() || "Participante";
+}
 
 window.onload=function(){
  revisarInvitacion();
@@ -649,6 +698,7 @@ function crearPerfil(){
  if(!n||!a){alert("Completá nombre y apellido.");return}
  usuario={id:"U"+Date.now(),nombre:n,apellido:a,edad:edad.value,ciudad:ciudad.value,hincha:hincha.value,insignia:"Sin insignia"};
  guardar("usuario",usuario);
+ guardarUsuarioOnline();
  cargarPreguntas();
  hideAll();
  examen.classList.remove("hidden");
@@ -714,6 +764,7 @@ function finalizarExamen(){
  usuario.examenIncorrectas=incorrectas;
  usuario.examenRespondidas=respondidas;
  guardar("usuario",usuario);
+ guardarUsuarioOnline();
 
  const inv=leer("invitacionPendiente",null);
  if(inv){
@@ -951,6 +1002,7 @@ function guardarPronostico(id){
 
  puntos=Object.keys(pronosticos).length*3;
  guardar("puntos",puntos);
+ guardarUsuarioOnline();
 
  toastMsg("Pronóstico guardado. Sumás en todos tus rankings.");
  mostrarHome();
@@ -991,6 +1043,7 @@ function agregarComunidad(nombre,tipo){
  if(!comunidades.find(c=>c.nombre.toLowerCase()===nombre.toLowerCase())){
   comunidades.push({id:"C"+Date.now(),nombre,tipo});
   guardar("comunidades",comunidades);
+  guardarUsuarioOnline();
  }
 }
 
@@ -1043,13 +1096,41 @@ function compartir(texto){
  }
 }
 
-function renderRanking(){
- const org=comunidades[0]?.nombre||"Individual";
- const html=`
- <div class="row">
-  <span>1. <b>${usuario.nombre} ${usuario.apellido}</b><br><small>${org}</small></span>
-  <b>${puntos} pts</b>
- </div>`;
+async function renderRanking(){
+ const usuariosOnline=await obtenerUsuariosOnline();
+
+ let lista=[];
+
+ if(usuariosOnline && usuariosOnline.length>0){
+  lista=usuariosOnline;
+ }else{
+  lista=[{
+   id:usuario.id,
+   nombre:usuario.nombre,
+   apellido:usuario.apellido,
+   puntos:puntos,
+   comunidades:comunidades
+  }];
+ }
+
+ lista.sort((a,b)=>(b.puntos||0)-(a.puntos||0));
+
+ const posicion=lista.findIndex(u=>u.id===usuario.id)+1;
+ const total=lista.length;
+
+ if(document.getElementById("posicionHome")){
+  posicionHome.innerText = posicion>0 ? `${posicion}° de ${total}` : "Sin clasificar";
+ }
+
+ const html=lista.map((u,i)=>{
+  const org=(u.comunidades && u.comunidades.length>0) ? `${u.comunidades.length} comunidad/es` : "Individual";
+  return `
+  <div class="row">
+   <span>${i+1}. <b>${nombreRanking(u)}</b><br><small>${org}</small></span>
+   <b>${u.puntos || 0} pts</b>
+  </div>`;
+ }).join("");
+
  ranking.innerHTML=html;
  rankingInicio.innerHTML=html;
 }
@@ -1089,12 +1170,7 @@ function icono(tipo){
 
 let devLogoTimer=null;
 
-function devLogoDown(e){
- if(e){
-  e.preventDefault();
-  e.stopPropagation();
- }
- devLogoUp();
+function devLogoDown(){
  devLogoTimer=setTimeout(()=>{
   abrirDevModal();
  },5000);
