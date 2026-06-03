@@ -266,6 +266,37 @@ button.disabledBtn{
 }
 
 
+
+.triviaScoreBox{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:10px 0;
+}
+.triviaMiniCard{
+  background:#ffffff0b;
+  border:1px solid #ffffff18;
+  border-radius:16px;
+  padding:12px;
+  text-align:center;
+}
+.triviaMiniCard b{
+  display:block;
+  font-size:24px;
+  color:#56ff33;
+}
+.triviaQuestion{
+  font-size:18px;
+  font-weight:900;
+  line-height:1.35;
+  margin:8px 0 12px;
+}
+.triviaResult{
+  margin-top:10px;
+  font-weight:900;
+  text-align:center;
+}
+
 </style>
 </head>
 
@@ -465,7 +496,32 @@ button.disabledBtn{
   </div>
 
   
-  <div id="viewReglamento" class="hidden">
+  
+  <div id="viewTrivia" class="hidden">
+    <div class="card">
+      <h2>🧠 Trivia Mundialista</h2>
+      <p class="small">Respondé preguntas y sumá puntos extra para el ranking general.</p>
+
+      <div class="triviaScoreBox">
+        <div class="triviaMiniCard">
+          <span class="small">Correctas</span>
+          <b id="triviaCorrectas">0</b>
+        </div>
+        <div class="triviaMiniCard">
+          <span class="small">Racha</span>
+          <b id="triviaRacha">0/5</b>
+        </div>
+        <div class="triviaMiniCard">
+          <span class="small">Puntos trivia</span>
+          <b id="triviaPuntos">0</b>
+        </div>
+      </div>
+
+      <div id="triviaContenido"></div>
+    </div>
+  </div>
+
+<div id="viewReglamento" class="hidden">
 <div class="card">
       <h2>📖 Reglamento Oficial</h2>
 
@@ -481,22 +537,29 @@ button.disabledBtn{
       <p class="small">🤝 Empate acertado: +1 punto</p>
       <p class="small">❌ Pronóstico incorrecto: 0 puntos</p>
 
-      <h3>4. Comunidades</h3>
+      <h3>4. Puntos por Trivia</h3>
+      <p class="small">La sección Trivia Mundialista permite responder preguntas sobre historia de los mundiales y sumar puntos extra al ranking general.</p>
+      <p class="small">✅ Para sumar puntos en Trivia, el participante deberá responder 5 preguntas correctas consecutivas.</p>
+      <p class="small">🏆 Cada racha de 5 respuestas correctas consecutivas suma +3 puntos.</p>
+      <p class="small">❌ Si el participante responde mal antes de completar las 5 correctas consecutivas, la racha vuelve a cero y no suma puntos.</p>
+      <p class="small">Los puntos de Trivia se agregan al puntaje general del participante, pero no reemplazan el sistema principal de puntos por pronósticos de partidos.</p>
+
+      <h3>5. Comunidades</h3>
       <p class="small">Podés participar simultáneamente en empresas, comercios, familias, grupos de amigos, peñas y otras comunidades.</p>
 
-      <h3>5. Ranking general</h3>
+      <h3>6. Ranking general</h3>
       <p class="small">Todos los participantes compiten también en una clasificación global.</p>
 
-      <h3>6. Ranking por comunidad</h3>
+      <h3>7. Ranking por comunidad</h3>
       <p class="small">Cada comunidad tendrá su propia tabla de posiciones.</p>
 
-      <h3>7. Fair Play</h3>
+      <h3>8. Fair Play</h3>
       <p class="small">Cada participante deberá utilizar un único perfil.</p>
 
-      <h3>8. Desempates</h3>
+      <h3>9. Desempates</h3>
       <p class="small">Mayor cantidad de resultados exactos, luego mayor cantidad de aciertos de ganador y finalmente antigüedad del registro.</p>
 
-      <h3>9. Juego responsable</h3>
+      <h3>10. Juego responsable</h3>
       <p class="small">El juego compulsivo es perjudicial para tu salud y la de tu familia.</p>
       <p class="small">Línea de Prevención de la Ludopatía (CABA y Provincia de Buenos Aires): <b>0800-333-0300</b></p>
       <p class="small">Esta aplicación es recreativa, gratuita y no realiza apuestas con dinero real.</p>
@@ -507,6 +570,7 @@ button.disabledBtn{
   <div id="viewPerfil" class="hidden">
     <div class="card">
       <h2>Mi perfil</h2>
+      <button class="dark" onclick="showView('reglamento')">📖 Ver Reglamento Oficial</button>
       <div id="perfilCompleto"></div>
     </div>
     <div class="card invite">
@@ -523,7 +587,7 @@ button.disabledBtn{
   <button id="navPartidos" onclick="showView('partidos')"><span class="navIcon">⚽</span>Partidos</button>
   <button id="navRanking" onclick="showView('ranking')"><span class="navIcon">🏆</span>Ranking</button>
   <button id="navComunidades" onclick="showView('comunidades')"><span class="navIcon">👥</span>Comunidades</button>
-  <button id="navReglamento" onclick="showView('reglamento')"><span class="navIcon">📖</span>Reglas</button><button id="navPerfil" onclick="showView('perfil')"><span class="navIcon">👤</span>Perfil</button>
+  <button id="navTrivia" onclick="showView('trivia')"><span class="navIcon">🧠</span>Trivia</button><button id="navPerfil" onclick="showView('perfil')"><span class="navIcon">👤</span>Perfil</button>
 </div>
 
 
@@ -644,6 +708,87 @@ const preguntasBase = [
 {p:"¿Qué selección eliminó a Argentina en Sudáfrica 2010?",o:["Alemania","España","Holanda","México"],r:"Alemania"},
 {p:"¿Qué selección fue subcampeona en 2010?",o:["Holanda","Alemania","Uruguay","Portugal"],r:"Holanda"},
 {p:"¿Qué selección fue cuarta en Sudáfrica 2010?",o:["Uruguay","Alemania","España","Holanda"],r:"Uruguay"}
+,{p:"¿Qué selección ganó el Mundial 1954?",o:["Alemania Federal","Hungría","Brasil","Uruguay"],r:"Alemania Federal"}
+,{p:"¿Qué selección perdió la final del Mundial 1954?",o:["Hungría","Alemania Federal","Austria","Uruguay"],r:"Hungría"}
+,{p:"¿Qué país fue sede del Mundial 1954?",o:["Suiza","Suecia","Chile","Francia"],r:"Suiza"}
+,{p:"¿Qué selección ganó el Mundial 1958?",o:["Brasil","Suecia","Francia","Alemania"],r:"Brasil"}
+,{p:"¿Qué jugador brasileño brilló con 17 años en el Mundial 1958?",o:["Pelé","Garrincha","Zagallo","Didí"],r:"Pelé"}
+,{p:"¿Qué país fue sede del Mundial 1958?",o:["Suecia","Suiza","Chile","Inglaterra"],r:"Suecia"}
+,{p:"¿Qué selección ganó el Mundial 1962?",o:["Brasil","Checoslovaquia","Chile","Argentina"],r:"Brasil"}
+,{p:"¿Qué país fue sede del Mundial 1962?",o:["Chile","Brasil","México","Uruguay"],r:"Chile"}
+,{p:"¿Qué selección fue subcampeona en 1962?",o:["Checoslovaquia","Brasil","Chile","Yugoslavia"],r:"Checoslovaquia"}
+,{p:"¿Qué selección fue subcampeona en 1966?",o:["Alemania Federal","Inglaterra","Portugal","Unión Soviética"],r:"Alemania Federal"}
+,{p:"¿Qué país fue sede del Mundial 1966?",o:["Inglaterra","Alemania","Francia","España"],r:"Inglaterra"}
+,{p:"¿Qué jugador portugués fue figura en el Mundial 1966?",o:["Eusébio","Figo","Cristiano Ronaldo","Deco"],r:"Eusébio"}
+,{p:"¿Qué selección fue subcampeona en 1970?",o:["Italia","Brasil","Alemania","Uruguay"],r:"Italia"}
+,{p:"¿Qué país fue sede del Mundial 1970?",o:["México","Brasil","Argentina","España"],r:"México"}
+,{p:"¿Qué selección fue subcampeona en 1974?",o:["Holanda","Alemania Federal","Polonia","Brasil"],r:"Holanda"}
+,{p:"¿Cómo se conoció al estilo de Holanda en los años 70?",o:["Fútbol total","Catenaccio","Tiki-taka","Jogo bonito"],r:"Fútbol total"}
+,{p:"¿Qué selección fue subcampeona en 1978?",o:["Holanda","Argentina","Brasil","Italia"],r:"Holanda"}
+,{p:"¿En qué ciudad se jugó la final del Mundial 1978?",o:["Buenos Aires","Rosario","Córdoba","Mar del Plata"],r:"Buenos Aires"}
+,{p:"¿Qué selección fue subcampeona en 1982?",o:["Alemania Federal","Italia","Brasil","Francia"],r:"Alemania Federal"}
+,{p:"¿Qué jugador italiano fue figura y goleador en 1982?",o:["Paolo Rossi","Baggio","Totti","Del Piero"],r:"Paolo Rossi"}
+,{p:"¿Qué selección eliminó a Brasil en el Mundial 1982?",o:["Italia","Argentina","Francia","Polonia"],r:"Italia"}
+,{p:"¿Quién convirtió el gol decisivo de Argentina en la final de 1986?",o:["Jorge Burruchaga","Maradona","Valdano","Brown"],r:"Jorge Burruchaga"}
+,{p:"¿A qué selección le hizo Maradona el Gol del Siglo?",o:["Inglaterra","Bélgica","Italia","Alemania"],r:"Inglaterra"}
+,{p:"¿Quién fue el entrenador de Argentina campeón mundial 1986?",o:["Carlos Bilardo","César Menotti","Alfio Basile","Marcelo Bielsa"],r:"Carlos Bilardo"}
+,{p:"¿Quién fue el entrenador de Argentina campeón mundial 1978?",o:["César Menotti","Carlos Bilardo","Passarella","Pekerman"],r:"César Menotti"}
+,{p:"¿Qué jugador argentino fue expulsado en la final del Mundial 1990?",o:["Monzón","Caniggia","Maradona","Ruggeri"],r:"Monzón"}
+,{p:"¿Quién fue el arquero argentino destacado en Italia 1990?",o:["Sergio Goycochea","Nery Pumpido","Ubaldo Fillol","Carlos Roa"],r:"Sergio Goycochea"}
+,{p:"¿Qué selección eliminó a Argentina en el Mundial 1998?",o:["Holanda","Inglaterra","Francia","Croacia"],r:"Holanda"}
+,{p:"¿Quién hizo el gol de Argentina a Inglaterra en 1998 tras una gran jugada colectiva?",o:["Javier Zanetti","Batistuta","Ortega","Verón"],r:"Javier Zanetti"}
+,{p:"¿Qué jugador argentino fue expulsado ante Holanda en 1998?",o:["Ariel Ortega","Simeone","Batistuta","Ayala"],r:"Ariel Ortega"}
+,{p:"¿Qué selección ganó el Mundial 2002?",o:["Brasil","Alemania","Turquía","Corea del Sur"],r:"Brasil"}
+,{p:"¿Contra quién jugó Brasil la final del Mundial 2002?",o:["Alemania","Italia","Turquía","Inglaterra"],r:"Alemania"}
+,{p:"¿Quién fue el técnico de Argentina en el Mundial 2006?",o:["José Pekerman","Marcelo Bielsa","Alfio Basile","Diego Maradona"],r:"José Pekerman"}
+,{p:"¿Quién fue el técnico de Argentina en el Mundial 2010?",o:["Diego Maradona","Sabella","Basile","Pekerman"],r:"Diego Maradona"}
+,{p:"¿Quién fue el técnico de Argentina en el Mundial 2014?",o:["Alejandro Sabella","Diego Maradona","Sampaoli","Scaloni"],r:"Alejandro Sabella"}
+,{p:"¿Quién fue el técnico de Argentina en el Mundial 2018?",o:["Jorge Sampaoli","Alejandro Sabella","Scaloni","Basile"],r:"Jorge Sampaoli"}
+,{p:"¿Quién fue el técnico de Argentina campeón en Qatar 2022?",o:["Lionel Scaloni","Sabella","Sampaoli","Pekerman"],r:"Lionel Scaloni"}
+,{p:"¿Qué jugador argentino hizo dos goles en la semifinal de Qatar 2022?",o:["Julián Álvarez","Messi","Di María","Enzo Fernández"],r:"Julián Álvarez"}
+,{p:"¿Contra quién jugó Argentina la semifinal de Qatar 2022?",o:["Croacia","Francia","Holanda","Australia"],r:"Croacia"}
+,{p:"¿Contra quién jugó Argentina los cuartos de final de Qatar 2022?",o:["Países Bajos","Croacia","Australia","Polonia"],r:"Países Bajos"}
+,{p:"¿Quién atajó dos penales ante Países Bajos en Qatar 2022?",o:["Emiliano Martínez","Romero","Armani","Rulli"],r:"Emiliano Martínez"}
+,{p:"¿Quién hizo el primer gol de Argentina en la final de Qatar 2022?",o:["Messi","Di María","Julián Álvarez","Enzo Fernández"],r:"Messi"}
+,{p:"¿Quién hizo el segundo gol de Argentina en la final de Qatar 2022?",o:["Di María","Messi","Julián Álvarez","Mac Allister"],r:"Di María"}
+,{p:"¿Qué jugador francés hizo tres goles en la final de Qatar 2022?",o:["Mbappé","Griezmann","Giroud","Dembélé"],r:"Mbappé"}
+,{p:"¿Qué arquero argentino atajó un mano a mano clave en la final 2022?",o:["Emiliano Martínez","Franco Armani","Rulli","Caballero"],r:"Emiliano Martínez"}
+,{p:"¿Qué selección eliminó a Portugal en Qatar 2022?",o:["Marruecos","Francia","España","Suiza"],r:"Marruecos"}
+,{p:"¿Qué selección eliminó a España en Qatar 2022?",o:["Marruecos","Croacia","Francia","Portugal"],r:"Marruecos"}
+,{p:"¿Quién ganó el premio al mejor jugador joven en Qatar 2022?",o:["Enzo Fernández","Julián Álvarez","Bellingham","Gvardiol"],r:"Enzo Fernández"}
+,{p:"¿Qué jugador croata ganó el Balón de Oro del Mundial 2018?",o:["Luka Modric","Rakitic","Mandzukic","Perisic"],r:"Luka Modric"}
+,{p:"¿Quién fue goleador del Mundial 1998?",o:["Davor Šuker","Ronaldo","Batistuta","Zidane"],r:"Davor Šuker"}
+,{p:"¿Quién fue goleador del Mundial 1990?",o:["Salvatore Schillaci","Matthäus","Klinsmann","Caniggia"],r:"Salvatore Schillaci"}
+,{p:"¿Quién fue goleador del Mundial 1986?",o:["Gary Lineker","Maradona","Butragueño","Valdano"],r:"Gary Lineker"}
+,{p:"¿Qué país organizará el Mundial 2026 junto a Estados Unidos y México?",o:["Canadá","Brasil","Argentina","Colombia"],r:"Canadá"}
+,{p:"¿Cuántas selecciones tendrá el Mundial 2026?",o:["48","32","40","64"],r:"48"}
+,{p:"¿En qué continente se jugará el Mundial 2026?",o:["América del Norte","Europa","Asia","Sudamérica"],r:"América del Norte"}
+,{p:"¿Qué tres países serán sede del Mundial 2026?",o:["Estados Unidos, México y Canadá","México, Brasil y Canadá","Estados Unidos, Argentina y México","Canadá, España y Portugal"],r:"Estados Unidos, México y Canadá"}
+,{p:"¿Qué selección ganó la Copa del Mundo más veces?",o:["Brasil","Alemania","Italia","Argentina"],r:"Brasil"}
+,{p:"¿Cuántos Mundiales ganó Brasil hasta Qatar 2022?",o:["5","4","3","6"],r:"5"}
+,{p:"¿Cuántos Mundiales ganó Argentina hasta Qatar 2022?",o:["3","2","4","1"],r:"3"}
+,{p:"¿Cuántos Mundiales ganó Alemania hasta Qatar 2022?",o:["4","3","5","2"],r:"4"}
+,{p:"¿Cuántos Mundiales ganó Italia hasta Qatar 2022?",o:["4","3","5","2"],r:"4"}
+,{p:"¿Qué selección ganó dos Mundiales consecutivos en 1958 y 1962?",o:["Brasil","Italia","Alemania","Argentina"],r:"Brasil"}
+,{p:"¿Qué selección ganó dos Mundiales consecutivos en 1934 y 1938?",o:["Italia","Uruguay","Brasil","Alemania"],r:"Italia"}
+,{p:"¿Qué jugador argentino convirtió ante México en Qatar 2022?",o:["Messi y Enzo Fernández","Di María y Messi","Julián y Enzo","Mac Allister y Messi"],r:"Messi y Enzo Fernández"}
+,{p:"¿Qué selección enfrentó Argentina en octavos de Qatar 2022?",o:["Australia","Polonia","Países Bajos","Croacia"],r:"Australia"}
+,{p:"¿Qué jugador convirtió el gol de Argentina ante Polonia en Qatar 2022 además de Julián Álvarez?",o:["Alexis Mac Allister","Messi","Di María","Enzo Fernández"],r:"Alexis Mac Allister"}
+,{p:"¿Qué selección derrotó a Argentina en el debut de Qatar 2022?",o:["Arabia Saudita","México","Polonia","Australia"],r:"Arabia Saudita"}
+,{p:"¿Qué selección eliminó a Alemania en fase de grupos 2018 al ganarle 2-0?",o:["Corea del Sur","México","Suecia","Japón"],r:"Corea del Sur"}
+,{p:"¿Qué selección venció a Alemania en el debut del Mundial 2018?",o:["México","Suecia","Corea del Sur","Brasil"],r:"México"}
+,{p:"¿Qué jugador colombiano fue revelación y goleador en 2014?",o:["James Rodríguez","Falcao","Cuadrado","Quintero"],r:"James Rodríguez"}
+,{p:"¿Qué selección fue sorpresa y llegó a cuartos en 2014?",o:["Costa Rica","Honduras","Ecuador","Grecia"],r:"Costa Rica"}
+,{p:"¿Qué jugador uruguayo fue Balón de Oro del Mundial 2010?",o:["Diego Forlán","Luis Suárez","Cavani","Sneijder"],r:"Diego Forlán"}
+,{p:"¿Quién atajó el penal decisivo para Argentina ante Países Bajos en 2014?",o:["Sergio Romero","Emiliano Martínez","Orion","Andújar"],r:"Sergio Romero"}
+,{p:"¿Qué frase se hizo famosa de Sergio Romero en 2014?",o:["Hoy te convertís en héroe","Qué mirás, bobo","Estamos en la final","La pelota no se mancha"],r:"Hoy te convertís en héroe"}
+,{p:"¿Qué selección eliminó a Argentina del Mundial 1994?",o:["Rumania","Brasil","Italia","Bulgaria"],r:"Rumania"}
+,{p:"¿Qué jugador rumano fue figura ante Argentina en 1994?",o:["Hagi","Popescu","Dumitrescu","Petrescu"],r:"Hagi"}
+,{p:"¿Quién convirtió el gol de Argentina ante Brasil en 1990?",o:["Caniggia","Maradona","Batistuta","Burruchaga"],r:"Caniggia"}
+,{p:"¿Quién dio la asistencia a Caniggia contra Brasil en 1990?",o:["Maradona","Burruchaga","Dezotti","Troglio"],r:"Maradona"}
+,{p:"¿Qué selección ganó el grupo de Argentina en Qatar 2022?",o:["Argentina","Polonia","México","Arabia Saudita"],r:"Argentina"}
+,{p:"¿Qué selección quedó última en el grupo de Argentina en Qatar 2022?",o:["México","Polonia","Arabia Saudita","Argentina"],r:"México"}
+
 ];
 
 const flag={
@@ -774,6 +919,10 @@ async function guardarUsuarioOnline(){
    puntos:puntos || 0,
    comunidades:comunidades || [],
    cantidadComunidades:(comunidades || []).length,
+   triviaPuntos:usuario.triviaPuntos || 0,
+   triviaCorrectas:usuario.triviaCorrectas || 0,
+   triviaRespondidas:usuario.triviaRespondidas || 0,
+   triviaRacha:usuario.triviaRacha || 0,
    actualizadoEn:firebase.firestore.FieldValue.serverTimestamp()
   },{merge:true});
  }catch(e){
@@ -1039,17 +1188,27 @@ function mostrarHome(){
 }
 
 function showView(view){
- ["Inicio","Partidos","Ranking","Comunidades","Reglamento","Perfil"].forEach(v=>{
-  document.getElementById("view"+v).classList.add("hidden");
-  document.getElementById("nav"+v).classList.remove("active");
+ ["Inicio","Partidos","Ranking","Trivia","Comunidades","Reglamento","Perfil"].forEach(v=>{
+  const vista=document.getElementById("view"+v);
+  const navBtn=document.getElementById("nav"+v);
+  if(vista) vista.classList.add("hidden");
+  if(navBtn) navBtn.classList.remove("active");
  });
+
  const id=view==="reglamento" ? "Reglamento" : view.charAt(0).toUpperCase()+view.slice(1);
- document.getElementById("view"+id).classList.remove("hidden");
- document.getElementById("nav"+id).classList.add("active");
+ const vistaActual=document.getElementById("view"+id);
+ if(vistaActual) vistaActual.classList.remove("hidden");
+
+ const navActual=document.getElementById("nav"+id);
+ if(navActual) navActual.classList.add("active");
 
  if(view==="partidos"){
   cargarFiltroDias();
   renderPartidos();
+ }
+
+ if(view==="trivia"){
+  renderTrivia();
  }
 
  window.scrollTo({top:0,behavior:"smooth"});
@@ -1503,9 +1662,80 @@ function renderPerfil(){
  <div class="row"><span>Ciudad</span><b>${usuario.ciudad||"-"}</b></div>
  <div class="row"><span>Hincha de</span><b>${usuario.hincha||"-"}</b></div>
  <div class="row"><span>Puntos</span><b>${puntos}</b></div>
+ <div class="row"><span>Puntos Trivia</span><b>${usuario.triviaPuntos||0}</b></div>
+ <div class="row"><span>Correctas Trivia</span><b>${usuario.triviaCorrectas||0}</b></div>
+ <div class="row"><span>Racha Trivia</span><b>${usuario.triviaRacha||0}/5</b></div>
  <div class="row"><span>Comunidades</span><b>${comunidades.length}</b></div>`;
 }
 
+
+
+
+function renderTrivia(){
+ const stats=leer("triviaStats",{correctas:0,respondidas:0,puntos:0,racha:0});
+ if(document.getElementById("triviaCorrectas")) triviaCorrectas.innerText=stats.correctas || 0;
+ if(document.getElementById("triviaRacha")) triviaRacha.innerText=`${stats.racha || 0}/5`;
+ if(document.getElementById("triviaPuntos")) triviaPuntos.innerText=stats.puntos || 0;
+
+ const q=preguntasBase[Math.floor(Math.random()*preguntasBase.length)];
+ guardar("triviaPreguntaActual",q);
+
+ const opciones=[...q.o].sort(()=>Math.random()-.5);
+
+ triviaContenido.innerHTML=`
+  <div class="match">
+    <div class="small">Sumás +3 puntos sólo si respondés 5 correctas consecutivas.</div>
+    <div class="triviaQuestion">${q.p}</div>
+    ${opciones.map(op=>`
+      <button class="dark" onclick="responderTrivia('${encodeURIComponent(op)}')">${op}</button>
+    `).join("")}
+    <div id="triviaResultado" class="triviaResult"></div>
+  </div>
+ `;
+}
+
+async function responderTrivia(opCod){
+ const op=decodeURIComponent(opCod);
+ const q=leer("triviaPreguntaActual",null);
+ if(!q) return;
+
+ let stats=leer("triviaStats",{correctas:0,respondidas:0,puntos:0,racha:0});
+ stats.respondidas=(stats.respondidas||0)+1;
+
+ if(op===q.r){
+  stats.correctas=(stats.correctas||0)+1;
+  stats.racha=(stats.racha||0)+1;
+
+  if(stats.racha>=5){
+   stats.puntos=(stats.puntos||0)+3;
+   puntos=(Number(puntos)||0)+3;
+   stats.racha=0;
+   guardar("puntos",puntos);
+   triviaResultado.innerHTML=`<span class="resultGood">✅ ¡5 correctas consecutivas! Sumaste +3 puntos.</span>`;
+  }else{
+   triviaResultado.innerHTML=`<span class="resultGood">✅ Correcto. Racha actual: ${stats.racha}/5.</span>`;
+  }
+ }else{
+  stats.racha=0;
+  triviaResultado.innerHTML=`<span class="resultBad">❌ Incorrecto. Respuesta correcta: ${q.r}. La racha vuelve a 0.</span>`;
+ }
+
+ guardar("triviaStats",stats);
+
+ if(usuario){
+  usuario.triviaCorrectas=stats.correctas||0;
+  usuario.triviaRespondidas=stats.respondidas||0;
+  usuario.triviaPuntos=stats.puntos||0;
+  usuario.triviaRacha=stats.racha||0;
+  guardar("usuario",usuario);
+  await guardarUsuarioOnline();
+ }
+
+ if(document.getElementById("puntosHome")) puntosHome.innerText=puntos;
+ renderRanking();
+
+ setTimeout(()=>renderTrivia(),1600);
+}
 
 
 function formatearFecha(fecha){
