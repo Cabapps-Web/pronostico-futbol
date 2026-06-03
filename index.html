@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Pronóstico de Fútbol">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -98,6 +98,70 @@ input,select{width:100%;padding:14px;border-radius:15px;border:1px solid #ffffff
 .navIcon{display:block;font-size:21px;margin-bottom:2px}
 
 .toast{position:fixed;bottom:86px;left:50%;transform:translateX(-50%);background:#56ff33;color:#06130b;font-weight:900;border-radius:16px;padding:14px;width:calc(100% - 34px);max-width:390px;text-align:center;display:none;z-index:50}
+
+.installOverlay,
+.dniOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.74);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:1000;
+}
+.installModal,
+.dniModal{
+  position:relative;
+  width:100%;
+  max-width:380px;
+  background:linear-gradient(180deg,#07182d,#03101f);
+  border:1px solid #ffffff2b;
+  border-radius:28px;
+  padding:22px 18px 18px;
+  box-shadow:0 22px 70px #000;
+  text-align:center;
+}
+.installClose,
+.dniClose{
+  position:absolute;
+  top:10px;
+  right:12px;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:1px solid #ffffff33;
+  background:#ffffff12;
+  color:#fff;
+  font-size:22px;
+  line-height:30px;
+  font-weight:900;
+  margin:0;
+  padding:0;
+}
+.installLogo,
+.dniLogo{
+  width:92px;
+  height:92px;
+  margin:6px auto 12px;
+}
+.installModal h2,
+.dniModal h2{
+  margin:8px 0 8px;
+  font-size:25px;
+}
+.installModal p,
+.dniModal p{
+  color:#d7e7ff;
+  font-size:16px;
+  line-height:1.35;
+  margin:0 0 16px;
+}
+.installBtn{
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+
 
 .devOverlay{
   position:fixed;
@@ -262,7 +326,7 @@ button.disabledBtn{
   <div class="topbar"><span class="topbarLogo logoBg" aria-label="Logo" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"></span> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
   <div class="card">
     <h2>Crear perfil</h2>
-    <p class="small">Tu perfil queda guardado en este celular.</p>
+    <p class="small">Tu perfil se guarda automáticamente para evitar duplicados y recuperar tus datos.</p>
     <input id="nombre" placeholder="Nombre">
     <input id="apellido" placeholder="Apellido">
     <input id="dni" inputmode="numeric" maxlength="8" placeholder="DNI sin puntos ni espacios">
@@ -456,6 +520,27 @@ button.disabledBtn{
   <button id="navReglamento" onclick="showView('reglamento')"><span class="navIcon">📖</span>Reglas</button><button id="navPerfil" onclick="showView('perfil')"><span class="navIcon">👤</span>Perfil</button>
 </div>
 
+
+
+<div id="installOverlay" class="installOverlay">
+  <div class="installModal">
+    <button class="installClose" onclick="cerrarInstallModal()">×</button>
+    <div class="installLogo logoBg"></div>
+    <h2>📲 Instalá la App</h2>
+    <p><b>Instalá la App ahora para empezar a jugar.</b></p>
+    <button class="installBtn" onclick="instalarApp()">INSTALAR APP</button>
+  </div>
+</div>
+
+<div id="dniOverlay" class="dniOverlay">
+  <div class="dniModal">
+    <button class="dniClose" onclick="cerrarDniModal()">×</button>
+    <div class="dniLogo logoBg"></div>
+    <h2>⚽ Pronóstico de Fútbol</h2>
+    <p>Este DNI ya se encuentra registrado.<br><br>Se cargará tu perfil existente para evitar duplicados.</p>
+    <button onclick="aceptarDniExistente()">Aceptar</button>
+  </div>
+</div>
 
 <div id="devOverlay" class="devOverlay">
   <div class="devModal">
@@ -825,9 +910,7 @@ async function crearPerfil(){
  const existente=await buscarUsuarioPorDni(d);
 
  if(existente){
-  alert("Este DNI ya está registrado. Se cargará el perfil existente para evitar duplicados.");
-  cargarUsuarioExistente(existente);
-  mostrarHome();
+  mostrarDniDuplicado(existente);
   return;
  }
 
@@ -1315,6 +1398,87 @@ function icono(tipo){
 
 
 
+
+
+
+let deferredInstallPrompt=null;
+
+function appEstaInstalada(){
+ return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone===true;
+}
+
+window.addEventListener("beforeinstallprompt", (e)=>{
+ e.preventDefault();
+ deferredInstallPrompt=e;
+ setTimeout(mostrarInstallModal,700);
+});
+
+window.addEventListener("appinstalled", ()=>{
+ localStorage.setItem("appInstalada","1");
+ cerrarInstallModal();
+});
+
+function mostrarInstallModal(){
+ if(appEstaInstalada()) return;
+ if(localStorage.getItem("appInstalada")==="1") return;
+
+ const cerradoHasta=Number(localStorage.getItem("installModalCerradoHasta") || 0);
+ if(Date.now()<cerradoHasta) return;
+
+ if(document.getElementById("installOverlay")){
+  installOverlay.style.display="flex";
+ }
+}
+
+function cerrarInstallModal(){
+ if(document.getElementById("installOverlay")){
+  installOverlay.style.display="none";
+ }
+ const treintaDias=30*24*60*60*1000;
+ localStorage.setItem("installModalCerradoHasta",String(Date.now()+treintaDias));
+}
+
+async function instalarApp(){
+ if(deferredInstallPrompt){
+  deferredInstallPrompt.prompt();
+  const choice=await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt=null;
+  if(choice && choice.outcome==="accepted"){
+   localStorage.setItem("appInstalada","1");
+   cerrarInstallModal();
+  }
+ }else{
+  // En navegadores que no entregan beforeinstallprompt, mantenemos el modal simple.
+  alert("Para instalar, tocá el menú del navegador y elegí Instalar aplicación o Agregar a pantalla de inicio.");
+ }
+}
+
+let usuarioExistentePendiente=null;
+
+function mostrarDniDuplicado(usuarioExistente){
+ usuarioExistentePendiente=usuarioExistente;
+ if(document.getElementById("dniOverlay")){
+  dniOverlay.style.display="flex";
+ }
+}
+
+function cerrarDniModal(){
+ if(document.getElementById("dniOverlay")){
+  dniOverlay.style.display="none";
+ }
+ usuarioExistentePendiente=null;
+}
+
+function aceptarDniExistente(){
+ if(usuarioExistentePendiente){
+  cargarUsuarioExistente(usuarioExistentePendiente);
+  usuarioExistentePendiente=null;
+ }
+ if(document.getElementById("dniOverlay")){
+  dniOverlay.style.display="none";
+ }
+ mostrarHome();
+}
 
 
 let devLogoTimer=null;
