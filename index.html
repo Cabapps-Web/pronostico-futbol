@@ -13,6 +13,31 @@ body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#020814;color:#f
 .hidden{display:none!important}
 
 .logo{display:block;width:88px;margin:14px auto 7px;filter:drop-shadow(0 0 18px #57ff39)}
+
+.logoBg{
+  background-image:url("logo.png");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:contain;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+  touch-action:none;
+}
+.logo.logoBg{
+  display:block;
+  width:88px;
+  height:88px;
+  margin:14px auto 7px;
+  filter:drop-shadow(0 0 18px #57ff39);
+}
+.topbarLogo{
+  width:42px;
+  height:42px;
+  display:inline-block;
+  flex:0 0 42px;
+}
+
 .brand{text-align:center;font-size:28px;font-weight:900;line-height:1;margin:0}
 .brand span{color:#56ff33}
 .slogan{text-align:center;margin:8px 0 14px;color:#d7e7ff;font-weight:bold;font-size:14px}
@@ -60,7 +85,7 @@ input,select{width:100%;padding:14px;border-radius:15px;border:1px solid #ffffff
 
 .invite{background:linear-gradient(135deg,#4cff3227,#1467ff28);border-color:#4cff3270}
 
-.bottomNav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#020814ee;border-top:1px solid #ffffff22;display:grid;grid-template-columns:repeat(5,1fr);padding:8px 4px 10px;z-index:20}
+.bottomNav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#020814ee;border-top:1px solid #ffffff22;display:grid;grid-template-columns:repeat(6,1fr);padding:8px 4px 10px;z-index:20}
 .bottomNav button{background:transparent;color:#dbe8f7;margin:0;padding:7px 2px;font-size:11px;border-radius:12px}
 .bottomNav button.active{color:#59ff35}
 .navIcon{display:block;font-size:21px;margin-bottom:2px}
@@ -178,7 +203,7 @@ button.disabledBtn{
 <div class="screen">
 
 <section id="welcome">
-  <img class="logo" src="logo.png" alt="Logo" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()">
+  <div class="logo logoBg" aria-label="Logo" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"></div>
   <h1 class="brand">PRONÓSTICO <span>DE FÚTBOL</span></h1>
   <p class="slogan">Demostrá que sos vos el que más sabe.</p>
 
@@ -195,7 +220,7 @@ button.disabledBtn{
 
 
 <section id="juegoResponsable" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><span class="topbarLogo logoBg" aria-label="Logo" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"></span> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
 
   <div class="card responsableBox">
     <div class="responsableIcon">⚠️</div>
@@ -227,7 +252,7 @@ button.disabledBtn{
 </section>
 
 <section id="registro" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><span class="topbarLogo logoBg" aria-label="Logo" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"></span> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
   <div class="card">
     <h2>Crear perfil</h2>
     <p class="small">Tu perfil queda guardado en este celular.</p>
@@ -242,7 +267,7 @@ button.disabledBtn{
 </section>
 
 <section id="examen" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><span class="topbarLogo logoBg" aria-label="Logo" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"></span> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
   <div class="card">
     <h2>Veamos Cuanto Sabés</h2>
     <p class="small">Respondé 5 preguntas y ganá tu primera insignia.</p>
@@ -253,7 +278,7 @@ button.disabledBtn{
 
 
 <section id="resultadoExamen" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><span class="topbarLogo logoBg" aria-label="Logo" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"></span> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
   <div class="card">
     <div class="resultBox">
       <h2>Resultado del desafío</h2>
@@ -268,7 +293,7 @@ button.disabledBtn{
 </section>
 
 <section id="home" class="hidden">
-  <div class="topbar"><img src="logo.png" onpointerdown="devLogoDown()" onpointerup="devLogoUp()" onpointerleave="devLogoUp()"> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
+  <div class="topbar"><span class="topbarLogo logoBg" aria-label="Logo" onpointerdown="devLogoDown(event)" onpointerup="devLogoUp()" onpointerleave="devLogoUp()" ontouchstart="devLogoDown(event)" ontouchend="devLogoUp()" ontouchcancel="devLogoUp()" oncontextmenu="return false;"></span> PRONÓSTICO <span style="color:#59ff35">DE FÚTBOL</span></div>
 
   <div id="viewInicio">
     <div class="card">
@@ -361,6 +386,46 @@ button.disabledBtn{
     </div>
   </div>
 
+  
+  <div id="viewReglamento" class="hidden">
+<div class="card">
+      <h2>📖 Reglamento Oficial</h2>
+
+      <h3>1. Objetivo</h3>
+      <p class="small">Pronosticá los resultados del Mundial y sumá puntos para competir en el ranking general y en todas las comunidades de las que formes parte.</p>
+
+      <h3>2. Cierre de pronósticos</h3>
+      <p class="small">Los pronósticos podrán cargarse o modificarse hasta 1 hora antes del inicio de cada partido.</p>
+
+      <h3>3. Sistema de puntuación</h3>
+      <p class="small">🏆 Resultado exacto: +3 puntos</p>
+      <p class="small">⚽ Ganador acertado: +1 punto</p>
+      <p class="small">🤝 Empate acertado: +1 punto</p>
+      <p class="small">❌ Pronóstico incorrecto: 0 puntos</p>
+
+      <h3>4. Comunidades</h3>
+      <p class="small">Podés participar simultáneamente en empresas, comercios, familias, grupos de amigos, peñas y otras comunidades.</p>
+
+      <h3>5. Ranking general</h3>
+      <p class="small">Todos los participantes compiten también en una clasificación global.</p>
+
+      <h3>6. Ranking por comunidad</h3>
+      <p class="small">Cada comunidad tendrá su propia tabla de posiciones.</p>
+
+      <h3>7. Fair Play</h3>
+      <p class="small">Cada participante deberá utilizar un único perfil.</p>
+
+      <h3>8. Desempates</h3>
+      <p class="small">Mayor cantidad de resultados exactos, luego mayor cantidad de aciertos de ganador y finalmente antigüedad del registro.</p>
+
+      <h3>9. Juego responsable</h3>
+      <p class="small">El juego compulsivo es perjudicial para tu salud y la de tu familia.</p>
+      <p class="small">Línea de Prevención de la Ludopatía (CABA y Provincia de Buenos Aires): <b>0800-333-0300</b></p>
+      <p class="small">Esta aplicación es recreativa, gratuita y no realiza apuestas con dinero real.</p>
+    </div>
+  </div>
+
+
   <div id="viewPerfil" class="hidden">
     <div class="card">
       <h2>Mi perfil</h2>
@@ -380,7 +445,7 @@ button.disabledBtn{
   <button id="navPartidos" onclick="showView('partidos')"><span class="navIcon">⚽</span>Partidos</button>
   <button id="navRanking" onclick="showView('ranking')"><span class="navIcon">🏆</span>Ranking</button>
   <button id="navComunidades" onclick="showView('comunidades')"><span class="navIcon">👥</span>Comunidades</button>
-  <button id="navPerfil" onclick="showView('perfil')"><span class="navIcon">👤</span>Perfil</button>
+  <button id="navReglamento" onclick="showView('reglamento')"><span class="navIcon">📖</span>Reglas</button><button id="navPerfil" onclick="showView('perfil')"><span class="navIcon">👤</span>Perfil</button>
 </div>
 
 
@@ -805,11 +870,11 @@ function mostrarHome(){
 }
 
 function showView(view){
- ["Inicio","Partidos","Ranking","Comunidades","Perfil"].forEach(v=>{
+ ["Inicio","Partidos","Ranking","Comunidades","Reglamento","Perfil"].forEach(v=>{
   document.getElementById("view"+v).classList.add("hidden");
   document.getElementById("nav"+v).classList.remove("active");
  });
- const id=view.charAt(0).toUpperCase()+view.slice(1);
+ const id=view==="reglamento" ? "Reglamento" : view.charAt(0).toUpperCase()+view.slice(1);
  document.getElementById("view"+id).classList.remove("hidden");
  document.getElementById("nav"+id).classList.add("active");
 
@@ -1168,9 +1233,18 @@ function icono(tipo){
 }
 
 
+
+
+
+
 let devLogoTimer=null;
 
-function devLogoDown(){
+function devLogoDown(e){
+ if(e){
+  e.preventDefault();
+  e.stopPropagation();
+ }
+ devLogoUp();
  devLogoTimer=setTimeout(()=>{
   abrirDevModal();
  },5000);
