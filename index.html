@@ -388,6 +388,12 @@ button.disabledBtn{
       <button onclick="showView('partidos')">Ver fixture y pronosticar</button>
     </div>
 
+    <div class="card" id="motor-prueba-card">
+      <h3>Motor de puntos</h3>
+      <p class="small">Prueba interna: Argentina 2 - 0 Argelia. Calcula puntos con los pronósticos guardados online.</p>
+      <button class="dark" onclick="calcularPuntosPrueba()">Probar cálculo de puntos</button>
+    </div>
+
     <div class="card">
       <h3>Ranking general</h3>
       <div id="rankingInicio"></div>
@@ -1135,6 +1141,131 @@ function cargarFiltroDias(){
  }
 }
 
+
+async function guardarPronosticoOnline(partidoId,golesLocal,golesVisitante){
+ if(!usuario) return;
+
+ const partido=fixture.find(p=>p.id===partidoId);
+ if(!partido) return;
+
+ const docId=`${usuario.id}_M${String(partidoId).padStart(3,"0")}`;
+
+ try{
+  await db.collection("pronosticos").doc(docId).set({
+   id:docId,
+   usuarioId:usuario.id,
+   dni:usuario.dni || "",
+   nombre:usuario.nombre || "",
+   apellido:usuario.apellido || "",
+   partidoId:partidoId,
+   partidoCodigo:`M${String(partidoId).padStart(3,"0")}`,
+   grupo:partido.g,
+   fecha:partido.d,
+   hora:partido.h,
+   local:partido.l,
+   visitante:partido.v,
+   golesLocal:Number(golesLocal),
+   golesVisitante:Number(golesVisitante),
+   puntosOtorgados:0,
+   tipoAcierto:"",
+   calculado:false,
+   actualizadoEn:firebase.firestore.FieldValue.serverTimestamp()
+  },{merge:true});
+ }catch(e){
+  console.error("Error guardando pronóstico online:",e);
+  alert("No se pudo guardar el pronóstico online. Revisá conexión.");
+ }
+}
+
+function puntosPorPronostico(pronLocal,pronVisitante,resLocal,resVisitante){
+ pronLocal=Number(pronLocal);
+ pronVisitante=Number(pronVisitante);
+ resLocal=Number(resLocal);
+ resVisitante=Number(resVisitante);
+
+ if(pronLocal===resLocal && pronVisitante===resVisitante){
+  return {puntos:3,tipo:"exacto"};
+ }
+
+ const pronSigno = pronLocal===pronVisitante ? "empate" : (pronLocal>pronVisitante ? "local" : "visitante");
+ const resSigno = resLocal===resVisitante ? "empate" : (resLocal>resVisitante ? "local" : "visitante");
+
+ if(pronSigno===resSigno){
+  return {puntos:1,tipo:resSigno==="empate" ? "empate" : "ganador"};
+ }
+
+ return {puntos:0,tipo:"fallado"};
+}
+
+async function calcularPuntosPrueba(){
+ const partidoPrueba=fixture.find(p=>p.l==="Argentina" && p.v==="Algeria");
+
+ if(!partidoPrueba){
+  alert("No encontré el partido de prueba Argentina vs Argelia.");
+  return;
+ }
+
+ const partidoId=partidoPrueba.id;
+ const resLocal=2;
+ const resVisitante=0;
+
+ try{
+  const snap=await db.collection("pronosticos").where("partidoId","==",partidoId).get();
+
+  if(snap.empty){
+   alert("Todavía no hay pronósticos guardados online para Argentina vs Argelia.");
+   return;
+  }
+
+  const puntosPorUsuario={};
+  const batch=db.batch();
+
+  snap.forEach(doc=>{
+   const pr=doc.data();
+   const calc=puntosPorPronostico(pr.golesLocal,pr.golesVisitante,resLocal,resVisitante);
+
+   batch.set(doc.ref,{
+    puntosOtorgados:calc.puntos,
+    tipoAcierto:calc.tipo,
+    calculado:true,
+    resultadoLocal:resLocal,
+    resultadoVisitante:resVisitante,
+    calculadoEn:firebase.firestore.FieldValue.serverTimestamp()
+   },{merge:true});
+
+   puntosPorUsuario[pr.usuarioId]=(puntosPorUsuario[pr.usuarioId] || 0) + calc.puntos;
+  });
+
+  await batch.commit();
+
+  const usuariosSnap=await db.collection("usuarios").get();
+  const batchUsuarios=db.batch();
+
+  usuariosSnap.forEach(doc=>{
+   const total=puntosPorUsuario[doc.id] || 0;
+   batchUsuarios.set(doc.ref,{puntos:total},{merge:true});
+
+   if(usuario && doc.id===usuario.id){
+    puntos=total;
+    guardar("puntos",puntos);
+   }
+  });
+
+  await batchUsuarios.commit();
+
+  if(usuario){
+   await guardarUsuarioOnline();
+  }
+
+  toastMsg("Cálculo de prueba aplicado. Ranking actualizado.");
+  mostrarHome();
+ }catch(e){
+  console.error("Error calculando puntos de prueba:",e);
+  alert("No se pudo calcular la prueba. Revisá conexión o Firebase.");
+ }
+}
+
+
 function renderPartidos(){
  const filtro=filtroGrupo.value;
  const dia=(document.getElementById("filtroDia")?.value)||"TODOS";
@@ -1209,7 +1340,7 @@ function renderPartidos(){
 }
 
 
-function guardarPronostico(id){
+async function guardarPronostico(id){
  const l=document.getElementById("l"+id).value;
  const v=document.getElementById("v"+id).value;
 
@@ -1228,11 +1359,12 @@ function guardarPronostico(id){
  pronosticos[id]={local:l,visitante:v};
  guardar("pronosticos",pronosticos);
 
- puntos=Object.keys(pronosticos).length*3;
- guardar("puntos",puntos);
- guardarUsuarioOnline();
+ await guardarPronosticoOnline(id,l,v);
 
- toastMsg("Pronóstico guardado. Sumás en todos tus rankings.");
+ // Los puntos NO se suman al guardar. Se calculan cuando exista resultado oficial.
+ await guardarUsuarioOnline();
+
+ toastMsg("Pronóstico guardado online.");
  mostrarHome();
  showView("partidos");
 }
