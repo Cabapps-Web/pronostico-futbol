@@ -297,6 +297,34 @@ button.disabledBtn{
   text-align:center;
 }
 
+
+.triviaTimer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#ffffff10;
+  border:1px solid #ffffff18;
+  border-radius:14px;
+  padding:10px;
+  margin:8px 0 12px;
+  font-weight:900;
+}
+.triviaTimer b{
+  color:#56ff33;
+  font-size:22px;
+}
+.rankingDetalle{
+  display:block;
+  margin-top:5px;
+  color:#bdd0e8;
+  font-size:12px;
+  font-weight:700;
+}
+.rankingDetalle span{
+  display:inline-block;
+  margin-right:8px;
+}
+
 </style>
 </head>
 
@@ -540,8 +568,9 @@ button.disabledBtn{
       <h3>4. Puntos por Trivia</h3>
       <p class="small">La sección Trivia Mundialista permite responder preguntas sobre historia de los mundiales y sumar puntos extra al ranking general.</p>
       <p class="small">✅ Para sumar puntos en Trivia, el participante deberá responder 5 preguntas correctas consecutivas.</p>
+      <p class="small">⏱ Cada pregunta de Trivia tendrá 5 segundos para ser respondida.</p>
       <p class="small">🏆 Cada racha de 5 respuestas correctas consecutivas suma +3 puntos.</p>
-      <p class="small">❌ Si el participante responde mal antes de completar las 5 correctas consecutivas, la racha vuelve a cero y no suma puntos.</p>
+      <p class="small">❌ Si el participante responde mal o se queda sin tiempo antes de completar las 5 correctas consecutivas, la racha vuelve a cero y no suma puntos.</p>
       <p class="small">Los puntos de Trivia se agregan al puntaje general del participante, pero no reemplazan el sistema principal de puntos por pronósticos de partidos.</p>
 
       <h3>5. Comunidades</h3>
@@ -1628,6 +1657,7 @@ async function renderRanking(){
    nombre:usuario.nombre,
    apellido:usuario.apellido,
    puntos:puntos,
+   triviaPuntos:usuario.triviaPuntos || 0,
    comunidades:comunidades
   }];
  }
@@ -1643,10 +1673,22 @@ async function renderRanking(){
 
  const html=lista.map((u,i)=>{
   const org=(u.comunidades && u.comunidades.length>0) ? `${u.comunidades.length} comunidad/es` : "Individual";
+  const totalPts=Number(u.puntos || 0);
+  const triviaPts=Number(u.triviaPuntos || 0);
+  const pronosticoPts=Math.max(totalPts-triviaPts,0);
+
   return `
   <div class="row">
-   <span>${i+1}. <b>${nombreRanking(u)}</b><br><small>${org}</small></span>
-   <b>${u.puntos || 0} pts</b>
+   <span>
+    ${i+1}. <b>${nombreRanking(u)}</b><br>
+    <small>${org}</small>
+    <span class="rankingDetalle">
+      <span>⚽ Pronósticos: ${pronosticoPts}</span>
+      <span>🧠 Trivia: ${triviaPts}</span>
+      <span>🏆 Total: ${totalPts}</span>
+    </span>
+   </span>
+   <b>${totalPts} pts</b>
   </div>`;
  }).join("");
 
@@ -1671,7 +1713,16 @@ function renderPerfil(){
 
 
 
+let triviaTimerInterval=null;
+let triviaBloqueada=false;
+
 function renderTrivia(){
+ if(triviaTimerInterval){
+  clearInterval(triviaTimerInterval);
+  triviaTimerInterval=null;
+ }
+ triviaBloqueada=false;
+
  const stats=leer("triviaStats",{correctas:0,respondidas:0,puntos:0,racha:0});
  if(document.getElementById("triviaCorrectas")) triviaCorrectas.innerText=stats.correctas || 0;
  if(document.getElementById("triviaRacha")) triviaRacha.innerText=`${stats.racha || 0}/5`;
@@ -1685,16 +1736,47 @@ function renderTrivia(){
  triviaContenido.innerHTML=`
   <div class="match">
     <div class="small">Sumás +3 puntos sólo si respondés 5 correctas consecutivas.</div>
+    <div class="triviaTimer">
+      <span>⏱ Tiempo para responder</span>
+      <b id="triviaTiempo">5</b>
+    </div>
     <div class="triviaQuestion">${q.p}</div>
     ${opciones.map(op=>`
-      <button class="dark" onclick="responderTrivia('${encodeURIComponent(op)}')">${op}</button>
+      <button class="dark triviaOpcion" onclick="responderTrivia('${encodeURIComponent(op)}')">${op}</button>
     `).join("")}
     <div id="triviaResultado" class="triviaResult"></div>
   </div>
  `;
+
+ let tiempo=5;
+ triviaTimerInterval=setInterval(()=>{
+  tiempo--;
+  if(document.getElementById("triviaTiempo")){
+   triviaTiempo.innerText=tiempo;
+  }
+  if(tiempo<=0){
+   clearInterval(triviaTimerInterval);
+   triviaTimerInterval=null;
+   responderTrivia("__TIEMPO__");
+  }
+ },1000);
 }
 
 async function responderTrivia(opCod){
+ if(triviaBloqueada) return;
+ triviaBloqueada=true;
+
+ if(triviaTimerInterval){
+  clearInterval(triviaTimerInterval);
+  triviaTimerInterval=null;
+ }
+
+ document.querySelectorAll(".triviaOpcion").forEach(b=>{
+  b.disabled=true;
+  b.style.opacity=".55";
+  b.style.pointerEvents="none";
+ });
+
  const op=decodeURIComponent(opCod);
  const q=leer("triviaPreguntaActual",null);
  if(!q) return;
@@ -1702,7 +1784,12 @@ async function responderTrivia(opCod){
  let stats=leer("triviaStats",{correctas:0,respondidas:0,puntos:0,racha:0});
  stats.respondidas=(stats.respondidas||0)+1;
 
- if(op===q.r){
+ if(op==="__TIEMPO__"){
+  stats.racha=0;
+  if(document.getElementById("triviaResultado")){
+   triviaResultado.innerHTML=`<span class="resultBad">⏱ Tiempo agotado. La respuesta correcta era: ${q.r}. La racha vuelve a 0.</span>`;
+  }
+ }else if(op===q.r){
   stats.correctas=(stats.correctas||0)+1;
   stats.racha=(stats.racha||0)+1;
 
@@ -1711,13 +1798,19 @@ async function responderTrivia(opCod){
    puntos=(Number(puntos)||0)+3;
    stats.racha=0;
    guardar("puntos",puntos);
-   triviaResultado.innerHTML=`<span class="resultGood">✅ ¡5 correctas consecutivas! Sumaste +3 puntos.</span>`;
+   if(document.getElementById("triviaResultado")){
+    triviaResultado.innerHTML=`<span class="resultGood">✅ ¡5 correctas consecutivas! Sumaste +3 puntos.</span>`;
+   }
   }else{
-   triviaResultado.innerHTML=`<span class="resultGood">✅ Correcto. Racha actual: ${stats.racha}/5.</span>`;
+   if(document.getElementById("triviaResultado")){
+    triviaResultado.innerHTML=`<span class="resultGood">✅ Correcto. Racha actual: ${stats.racha}/5.</span>`;
+   }
   }
  }else{
   stats.racha=0;
-  triviaResultado.innerHTML=`<span class="resultBad">❌ Incorrecto. Respuesta correcta: ${q.r}. La racha vuelve a 0.</span>`;
+  if(document.getElementById("triviaResultado")){
+   triviaResultado.innerHTML=`<span class="resultBad">❌ Incorrecto. Respuesta correcta: ${q.r}. La racha vuelve a 0.</span>`;
+  }
  }
 
  guardar("triviaStats",stats);
@@ -1734,7 +1827,7 @@ async function responderTrivia(opCod){
  if(document.getElementById("puntosHome")) puntosHome.innerText=puntos;
  renderRanking();
 
- setTimeout(()=>renderTrivia(),1600);
+ setTimeout(()=>renderTrivia(),1800);
 }
 
 
