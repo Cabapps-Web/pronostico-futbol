@@ -1576,6 +1576,12 @@ async function sincronizarResultadosAutomaticos(mostrarAviso=false){
    throw new Error("La API respondió, pero no encontré partidos.");
   }
 
+  const existentesSnap=await db.collection("resultados").get();
+  const resultadosExistentes={};
+  existentesSnap.forEach(doc=>{
+   resultadosExistentes[doc.id]=doc.data();
+  });
+
   let actualizados=0;
   let finalizados=0;
   const batch=db.batch();
@@ -1585,9 +1591,17 @@ async function sincronizarResultadosAutomaticos(mostrarAviso=false){
    if(!game) return;
 
    const codigo=`M${String(partido.id).padStart(3,"0")}`;
-   const finalizado=apiFinalizado(game);
-   const golesLocal=numeroApi(game.home_score ?? game.homeScore ?? game.home_goals ?? game.homeGoals);
-   const golesVisitante=numeroApi(game.away_score ?? game.awayScore ?? game.away_goals ?? game.awayGoals);
+   const existente=resultadosExistentes[codigo] || {};
+
+   const apiDiceFinalizado=apiFinalizado(game);
+   const apiGolesLocal=numeroApi(game.home_score ?? game.homeScore ?? game.home_goals ?? game.homeGoals);
+   const apiGolesVisitante=numeroApi(game.away_score ?? game.awayScore ?? game.away_goals ?? game.awayGoals);
+
+   const mantenerFinalizado = existente.finalizado === true && apiDiceFinalizado === false;
+
+   const finalizado = mantenerFinalizado ? true : apiDiceFinalizado;
+   const golesLocal = mantenerFinalizado ? Number(existente.golesLocal || 0) : apiGolesLocal;
+   const golesVisitante = mantenerFinalizado ? Number(existente.golesVisitante || 0) : apiGolesVisitante;
 
    const ref=db.collection("resultados").doc(codigo);
    batch.set(ref,{
@@ -1606,6 +1620,7 @@ async function sincronizarResultadosAutomaticos(mostrarAviso=false){
     finalizado:finalizado,
     apiFinished:String(game.finished ?? ""),
     apiTimeElapsed:String(game.time_elapsed ?? ""),
+    conservadoManual:mantenerFinalizado,
     actualizadoEn:firebase.firestore.FieldValue.serverTimestamp()
    },{merge:true});
 
@@ -1624,7 +1639,6 @@ async function sincronizarResultadosAutomaticos(mostrarAviso=false){
     actualizadoEn:firebase.firestore.FieldValue.serverTimestamp()
    },{merge:true});
   }
-
 
   if(finalizados>0){
    await recalcularRankingPorResultados();
@@ -1818,6 +1832,7 @@ async function guardarPronostico(id){
 
  // Los puntos NO se suman al guardar. Se calculan cuando exista resultado oficial.
  await guardarUsuarioOnline();
+ await recalcularRankingPorResultados();
 
  toastMsg("Pronóstico guardado online.");
  mostrarHome();
