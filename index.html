@@ -1474,6 +1474,8 @@ function normalizarNombreEquipo(nombre){
   .replace("turkiye","turkey")
   .replace("türkiye","turkey")
   .replace("united states","usa")
+  .replace("southafrica","southafrica")
+  .replace("bosniaandherzegovina","bosniaherzegovina")
   .replace("korea republic","south korea")
   .replace("ir iran","iran")
   .replace("cabo verde","cape verde")
@@ -1492,6 +1494,37 @@ function tomarGamesApi(data){
  return [];
 }
 
+
+function normalizarFechaApi(fechaApi){
+ const s=String(fechaApi || "").trim();
+ if(!s) return "";
+
+ const m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+ if(m){
+  const mm=String(m[1]).padStart(2,"0");
+  const dd=String(m[2]).padStart(2,"0");
+  const yyyy=m[3];
+  return `${yyyy}-${mm}-${dd}`;
+ }
+
+ const iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+ if(iso){
+  return `${iso[1]}-${iso[2]}-${iso[3]}`;
+ }
+
+ return s.slice(0,10);
+}
+
+function normalizarHoraApi(fechaApi){
+ const s=String(fechaApi || "").trim();
+ const m=s.match(/(\d{1,2}):(\d{2})/);
+ if(m){
+  return `${String(m[1]).padStart(2,"0")}:${m[2]}`;
+ }
+ return "";
+}
+
+
 function buscarGameApiParaPartido(partido,games){
  const local=normalizarNombreEquipo(partido.l);
  const visitante=normalizarNombreEquipo(partido.v);
@@ -1500,12 +1533,15 @@ function buscarGameApiParaPartido(partido,games){
  return games.find(g=>{
   const gh=normalizarNombreEquipo(g.home_team_name_en || g.home_team || g.homeTeam || g.local || "");
   const ga=normalizarNombreEquipo(g.away_team_name_en || g.away_team || g.awayTeam || g.visitor || "");
-  const gd=String(g.local_date || g.date || "").slice(0,10);
+  const gd=normalizarFechaApi(g.local_date || g.date || g.datetime || g.kickoff || "");
+  const grupoApi=String(g.group || "").toUpperCase();
+  const grupoFixture=String(partido.g || "").toUpperCase();
 
   const equiposCoinciden = gh===local && ga===visitante;
   const fechaCoincide = !gd || gd===fecha;
+  const grupoCoincide = !grupoApi || grupoApi===grupoFixture;
 
-  return equiposCoinciden && fechaCoincide;
+  return equiposCoinciden && fechaCoincide && grupoCoincide;
  });
 }
 
@@ -1561,6 +1597,8 @@ async function sincronizarResultadosAutomaticos(mostrarAviso=false){
     grupo:partido.g,
     fecha:partido.d,
     hora:partido.h,
+    apiFecha:normalizarFechaApi(game.local_date || game.date || ""),
+    apiHora:normalizarHoraApi(game.local_date || game.date || ""),
     local:partido.l,
     visitante:partido.v,
     golesLocal:golesLocal,
@@ -1577,12 +1615,23 @@ async function sincronizarResultadosAutomaticos(mostrarAviso=false){
 
   await batch.commit();
 
+  if(actualizados===0){
+   await db.collection("resultados").doc("_diagnostico").set({
+    mensaje:"La API respondió, pero no se emparejó ningún partido con el fixture interno.",
+    apiCantidad:games.length,
+    primerJuegoApi:games[0] || null,
+    primerPartidoFixture:fixture[0] || null,
+    actualizadoEn:firebase.firestore.FieldValue.serverTimestamp()
+   },{merge:true});
+  }
+
+
   if(finalizados>0){
    await recalcularRankingPorResultados();
   }
 
   if(document.getElementById("estadoResultadosTexto")){
-   estadoResultadosTexto.innerText=`Resultados sincronizados. Partidos encontrados: ${actualizados}. Finalizados: ${finalizados}.`;
+   estadoResultadosTexto.innerText=`Resultados sincronizados. API: ${games.length} partidos. Emparejados: ${actualizados}. Finalizados: ${finalizados}.`;
   }
 
   if(mostrarAviso){
