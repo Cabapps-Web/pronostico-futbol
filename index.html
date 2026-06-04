@@ -447,6 +447,12 @@ button.disabledBtn{
       <button onclick="showView('partidos')">Ver fixture y pronosticar</button>
     </div>
 
+    <div class="card" id="estadoResultadosCard">
+      <h3>Resultados oficiales</h3>
+      <p id="estadoResultadosTexto" class="small">La app buscará automáticamente resultados oficiales para actualizar el ranking.</p>
+      <button class="dark" onclick="sincronizarResultadosAutomaticos(true)">Actualizar resultados ahora</button>
+    </div>
+
     <div class="card" id="motor-prueba-card">
       <h3>Motor de puntos</h3>
       <p class="small">Prueba interna: Argentina 2 - 0 Argelia. Calcula puntos con los pronósticos guardados online.</p>
@@ -674,6 +680,9 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+const RESULTADOS_API_URL = "https://script.google.com/macros/s/AKfycbynI_YULJJwdkbb-5HSDRRUMRTs-6Y84EY5qZ7n_IcgrPyWMZbzjQjaqWoUW97h2Lx_/exec";
+let sincronizandoResultados=false;
 
 const preguntasBase = [
 {p:"¿Quién fue el goleador del Mundial 2002?",o:["Ronaldo","Rivaldo","Klose","Batistuta"],r:"Ronaldo"},
@@ -946,6 +955,8 @@ async function guardarUsuarioOnline(){
    hincha:usuario.hincha || "",
    insignia:usuario.insignia || "Sin insignia",
    puntos:puntos || 0,
+   puntosPronosticos:usuario.puntosPronosticos || 0,
+   puntosTrivia:usuario.triviaPuntos || 0,
    comunidades:comunidades || [],
    cantidadComunidades:(comunidades || []).length,
    triviaPuntos:usuario.triviaPuntos || 0,
@@ -1214,6 +1225,7 @@ function mostrarHome(){
  renderPerfil();
  actualizarSelectInvitar();
  showView("inicio");
+ sincronizarResultadosAutomaticos(false);
 }
 
 function showView(view){
@@ -1454,6 +1466,212 @@ async function calcularPuntosPrueba(){
 }
 
 
+
+function normalizarNombreEquipo(nombre){
+ return String(nombre || "")
+  .toLowerCase()
+  .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+  .replace("turkiye","turkey")
+  .replace("türkiye","turkey")
+  .replace("united states","usa")
+  .replace("korea republic","south korea")
+  .replace("ir iran","iran")
+  .replace("cabo verde","cape verde")
+  .replace("ivory coast","cote d ivoire")
+  .replace("dr congo","congo dr")
+  .replace(/[^a-z0-9]+/g,"")
+  .trim();
+}
+
+function tomarGamesApi(data){
+ if(Array.isArray(data)) return data;
+ if(Array.isArray(data.games)) return data.games;
+ if(Array.isArray(data.data)) return data.data;
+ if(Array.isArray(data.matches)) return data.matches;
+ if(Array.isArray(data.result)) return data.result;
+ return [];
+}
+
+function buscarGameApiParaPartido(partido,games){
+ const local=normalizarNombreEquipo(partido.l);
+ const visitante=normalizarNombreEquipo(partido.v);
+ const fecha=partido.d;
+
+ return games.find(g=>{
+  const gh=normalizarNombreEquipo(g.home_team_name_en || g.home_team || g.homeTeam || g.local || "");
+  const ga=normalizarNombreEquipo(g.away_team_name_en || g.away_team || g.awayTeam || g.visitor || "");
+  const gd=String(g.local_date || g.date || "").slice(0,10);
+
+  const equiposCoinciden = gh===local && ga===visitante;
+  const fechaCoincide = !gd || gd===fecha;
+
+  return equiposCoinciden && fechaCoincide;
+ });
+}
+
+function apiFinalizado(game){
+ const f=String(game.finished ?? game.is_finished ?? game.completed ?? "").toLowerCase();
+ const status=String(game.status ?? game.match_status ?? game.state ?? game.time_elapsed ?? "").toLowerCase();
+
+ return f==="true" || f==="1" || status==="finished" || status==="ended" || status==="fulltime" || status==="ft";
+}
+
+function numeroApi(valor){
+ const n=Number(valor);
+ return Number.isFinite(n) ? n : 0;
+}
+
+async function sincronizarResultadosAutomaticos(mostrarAviso=false){
+ if(sincronizandoResultados) return;
+ sincronizandoResultados=true;
+
+ if(document.getElementById("estadoResultadosTexto")){
+  estadoResultadosTexto.innerText="Buscando resultados oficiales...";
+ }
+
+ try{
+  const res=await fetch(RESULTADOS_API_URL,{cache:"no-store"});
+  if(!res.ok) throw new Error("HTTP "+res.status);
+
+  const data=await res.json();
+  const games=tomarGamesApi(data);
+
+  if(!games.length){
+   throw new Error("La API respondió, pero no encontré partidos.");
+  }
+
+  let actualizados=0;
+  let finalizados=0;
+  const batch=db.batch();
+
+  fixture.forEach(partido=>{
+   const game=buscarGameApiParaPartido(partido,games);
+   if(!game) return;
+
+   const codigo=`M${String(partido.id).padStart(3,"0")}`;
+   const finalizado=apiFinalizado(game);
+   const golesLocal=numeroApi(game.home_score ?? game.homeScore ?? game.home_goals ?? game.homeGoals);
+   const golesVisitante=numeroApi(game.away_score ?? game.awayScore ?? game.away_goals ?? game.awayGoals);
+
+   const ref=db.collection("resultados").doc(codigo);
+   batch.set(ref,{
+    id:codigo,
+    partidoId:partido.id,
+    apiId:String(game.id || game._id || ""),
+    grupo:partido.g,
+    fecha:partido.d,
+    hora:partido.h,
+    local:partido.l,
+    visitante:partido.v,
+    golesLocal:golesLocal,
+    golesVisitante:golesVisitante,
+    finalizado:finalizado,
+    apiFinished:String(game.finished ?? ""),
+    apiTimeElapsed:String(game.time_elapsed ?? ""),
+    actualizadoEn:firebase.firestore.FieldValue.serverTimestamp()
+   },{merge:true});
+
+   actualizados++;
+   if(finalizado) finalizados++;
+  });
+
+  await batch.commit();
+
+  if(finalizados>0){
+   await recalcularRankingPorResultados();
+  }
+
+  if(document.getElementById("estadoResultadosTexto")){
+   estadoResultadosTexto.innerText=`Resultados sincronizados. Partidos encontrados: ${actualizados}. Finalizados: ${finalizados}.`;
+  }
+
+  if(mostrarAviso){
+   toastMsg(`Resultados actualizados. Finalizados: ${finalizados}`);
+  }
+
+ }catch(e){
+  console.error("Error sincronizando resultados:",e);
+  if(document.getElementById("estadoResultadosTexto")){
+   estadoResultadosTexto.innerText="No se pudieron actualizar resultados ahora. La app volverá a intentar automáticamente.";
+  }
+  if(mostrarAviso){
+   alert("No se pudieron actualizar resultados. Revisá conexión o Apps Script.");
+  }
+ }finally{
+  sincronizandoResultados=false;
+ }
+}
+
+async function recalcularRankingPorResultados(){
+ try{
+  const resultadosSnap=await db.collection("resultados").where("finalizado","==",true).get();
+  if(resultadosSnap.empty) return;
+
+  const resultadosPorPartido={};
+  resultadosSnap.forEach(doc=>{
+   const r=doc.data();
+   resultadosPorPartido[Number(r.partidoId)] = r;
+  });
+
+  const pronSnap=await db.collection("pronosticos").get();
+  const puntosPronosticoPorUsuario={};
+  const batchPron=db.batch();
+
+  pronSnap.forEach(doc=>{
+   const pr=doc.data();
+   const r=resultadosPorPartido[Number(pr.partidoId)];
+   if(!r) return;
+
+   const calc=puntosPorPronostico(pr.golesLocal,pr.golesVisitante,r.golesLocal,r.golesVisitante);
+
+   batchPron.set(doc.ref,{
+    puntosOtorgados:calc.puntos,
+    tipoAcierto:calc.tipo,
+    calculado:true,
+    resultadoLocal:r.golesLocal,
+    resultadoVisitante:r.golesVisitante,
+    calculadoEn:firebase.firestore.FieldValue.serverTimestamp()
+   },{merge:true});
+
+   puntosPronosticoPorUsuario[pr.usuarioId]=(puntosPronosticoPorUsuario[pr.usuarioId] || 0) + calc.puntos;
+  });
+
+  await batchPron.commit();
+
+  const usuariosSnap=await db.collection("usuarios").get();
+  const batchUsuarios=db.batch();
+
+  usuariosSnap.forEach(doc=>{
+   const u=doc.data();
+   const puntosPronosticos=Number(puntosPronosticoPorUsuario[doc.id] || 0);
+   const puntosTrivia=Number(u.triviaPuntos || u.puntosTrivia || 0);
+   const total=puntosPronosticos + puntosTrivia;
+
+   batchUsuarios.set(doc.ref,{
+    puntosPronosticos:puntosPronosticos,
+    puntosTrivia:puntosTrivia,
+    puntos:total,
+    rankingActualizadoEn:firebase.firestore.FieldValue.serverTimestamp()
+   },{merge:true});
+
+   if(usuario && doc.id===usuario.id){
+    puntos=total;
+    usuario.puntosPronosticos=puntosPronosticos;
+    usuario.triviaPuntos=puntosTrivia;
+    guardar("puntos",puntos);
+    guardar("usuario",usuario);
+   }
+  });
+
+  await batchUsuarios.commit();
+  renderRanking();
+
+ }catch(e){
+  console.error("Error recalculando ranking:",e);
+ }
+}
+
+
 function renderPartidos(){
  const filtro=filtroGrupo.value;
  const dia=(document.getElementById("filtroDia")?.value)||"TODOS";
@@ -1657,7 +1875,9 @@ async function renderRanking(){
    nombre:usuario.nombre,
    apellido:usuario.apellido,
    puntos:puntos,
+   puntosPronosticos:usuario.puntosPronosticos || 0,
    triviaPuntos:usuario.triviaPuntos || 0,
+   puntosTrivia:usuario.triviaPuntos || 0,
    comunidades:comunidades
   }];
  }
@@ -1674,8 +1894,8 @@ async function renderRanking(){
  const html=lista.map((u,i)=>{
   const org=(u.comunidades && u.comunidades.length>0) ? `${u.comunidades.length} comunidad/es` : "Individual";
   const totalPts=Number(u.puntos || 0);
-  const triviaPts=Number(u.triviaPuntos || 0);
-  const pronosticoPts=Math.max(totalPts-triviaPts,0);
+  const triviaPts=Number(u.triviaPuntos || u.puntosTrivia || 0);
+  const pronosticoPts=Number(u.puntosPronosticos || Math.max(totalPts-triviaPts,0));
 
   return `
   <div class="row">
