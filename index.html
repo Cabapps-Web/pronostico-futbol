@@ -325,6 +325,31 @@ button.disabledBtn{
   margin-right:8px;
 }
 
+.rankingTabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin:10px 0 14px;
+}
+.rankingTabs button{
+  margin:0;
+  padding:11px 8px;
+  border-radius:14px;
+  background:#ffffff10;
+  color:#dbe8f7;
+  border:1px solid #ffffff22;
+  font-size:13px;
+}
+.rankingTabs button.active{
+  background:linear-gradient(135deg,#4cff32,#9dff00);
+  color:#06130b;
+}
+.rankingSubtitulo{
+  color:#bdd0e8;
+  font-size:13px;
+  margin:0 0 10px;
+}
+
 </style>
 </head>
 
@@ -431,8 +456,8 @@ button.disabledBtn{
       <h2 id="saludo"></h2>
       <div id="insignia" class="badge"></div>
       <p id="perfilDato" class="small"></p>
-      <div class="row"><span>Mi posición general</span><b id="posicionHome">Sin clasificar</b></div>
-      <div class="row"><span>⚽ Pronósticos + 🧠 Trivia</span><b><span id="puntosHome">0</span> pts</b></div>
+      <div class="row"><span>Mi posición en pronósticos</span><b id="posicionHome">Sin clasificar</b></div>
+      <div class="row"><span>⚽ Puntos por pronósticos</span><b><span id="puntosHome">0</span> pts</b></div>
     </div>
 
     <div class="card invite">
@@ -460,7 +485,8 @@ button.disabledBtn{
     </div>
 
     <div class="card">
-      <h3>Ranking general</h3>
+      <h3>🏆 Ranking de pronósticos</h3>
+      <p class="small">El campeón del Mundial se define por los puntos obtenidos en los partidos.</p>
       <div id="rankingInicio"></div>
     </div>
   </div>
@@ -494,7 +520,12 @@ button.disabledBtn{
 
   <div id="viewRanking" class="hidden">
     <div class="card">
-      <h2>Ranking general</h2>
+      <h2>Rankings</h2>
+      <div class="rankingTabs">
+        <button id="tabRankingPronosticos" class="active" onclick="setRankingModo('pronosticos')">⚽ Pronósticos</button>
+        <button id="tabRankingTrivia" onclick="setRankingModo('trivia')">🧠 Trivia</button>
+      </div>
+      <p id="rankingSubtitulo" class="rankingSubtitulo">Campeón de pronósticos: sólo cuentan los puntos de partidos.</p>
       <div id="ranking"></div>
     </div>
   </div>
@@ -534,7 +565,7 @@ button.disabledBtn{
   <div id="viewTrivia" class="hidden">
     <div class="card">
       <h2>🧠 Trivia Mundialista</h2>
-      <p class="small">Respondé preguntas y sumá puntos extra para el ranking general.</p>
+      <p class="small">Respondé preguntas y competí en el ranking de Trivia.</p>
 
       <div class="triviaScoreBox">
         <div class="triviaMiniCard">
@@ -560,7 +591,7 @@ button.disabledBtn{
       <h2>📖 Reglamento Oficial</h2>
 
       <h3>1. Objetivo</h3>
-      <p class="small">Pronosticá los resultados del Mundial y sumá puntos para competir en el ranking general y en todas las comunidades de las que formes parte.</p>
+      <p class="small">Pronosticá los resultados del Mundial y sumá puntos para competir en el ranking de Pronósticos y en tus comunidades.</p>
 
       <h3>2. Cierre de pronósticos</h3>
       <p class="small">Los pronósticos podrán cargarse o modificarse hasta 1 hora antes del inicio de cada partido.</p>
@@ -572,18 +603,18 @@ button.disabledBtn{
       <p class="small">❌ Pronóstico incorrecto: 0 puntos</p>
 
       <h3>4. Puntos por Trivia</h3>
-      <p class="small">La sección Trivia Mundialista permite responder preguntas sobre historia de los mundiales y sumar puntos extra al ranking general.</p>
+      <p class="small">La sección Trivia Mundialista tiene su propio ranking independiente. Sirve para jugar en los momentos sin partidos, sin mezclar sus puntos con los pronósticos.</p>
       <p class="small">✅ Para sumar puntos en Trivia, el participante deberá responder 5 preguntas correctas consecutivas.</p>
       <p class="small">⏱ Cada pregunta de Trivia tendrá 5 segundos para ser respondida.</p>
       <p class="small">🏆 Cada racha de 5 respuestas correctas consecutivas suma +3 puntos.</p>
       <p class="small">❌ Si el participante responde mal o se queda sin tiempo antes de completar las 5 correctas consecutivas, la racha vuelve a cero y no suma puntos.</p>
-      <p class="small">Los puntos de Trivia se agregan al puntaje general del participante, pero no reemplazan el sistema principal de puntos por pronósticos de partidos.</p>
+      <p class="small">Los puntos de Trivia no se suman al ranking de Pronósticos. Habrá un campeón de Pronósticos y un campeón de Trivia.</p>
 
       <h3>5. Comunidades</h3>
       <p class="small">Podés participar simultáneamente en empresas, comercios, familias, grupos de amigos, peñas y otras comunidades.</p>
 
-      <h3>6. Ranking general</h3>
-      <p class="small">Todos los participantes compiten también en una clasificación global.</p>
+      <h3>6. Ranking de Pronósticos</h3>
+      <p class="small">Es el ranking principal. Sólo cuenta los puntos obtenidos por resultados de partidos.</p>
 
       <h3>7. Ranking por comunidad</h3>
       <p class="small">Cada comunidad tendrá su propia tabla de posiciones.</p>
@@ -938,6 +969,7 @@ let comunidades=leer("comunidades",[]);
 let pronosticos=leer("pronosticos",{});
 let puntos=leer("puntos",0);
 let firebaseDisponible=true;
+let rankingModo="pronosticos";
 
 async function guardarUsuarioOnline(){
  if(!usuario) return;
@@ -973,7 +1005,7 @@ async function guardarUsuarioOnline(){
 
 async function obtenerUsuariosOnline(){
  try{
-  const snap=await db.collection("usuarios").orderBy("puntos","desc").get();
+  const snap=await db.collection("usuarios").get();
   return snap.docs.map(doc=>doc.data());
  }catch(e){
   firebaseDisponible=false;
@@ -1218,7 +1250,7 @@ function mostrarHome(){
  saludo.innerText=`Hola, ${usuario.nombre}`;
  insignia.innerText=usuario.insignia;
  perfilDato.innerText=`${usuario.ciudad||"Ciudad no informada"} · Hincha de ${usuario.hincha||"equipo no informado"}`;
- puntosHome.innerText=puntos;
+ puntosHome.innerText=usuario.puntosPronosticos || 0;
  renderPartidos();
  renderComunidades();
  renderRanking();
@@ -1645,11 +1677,11 @@ async function sincronizarResultadosAutomaticos(mostrarAviso=false){
   }
 
   if(document.getElementById("estadoResultadosTexto")){
-   estadoResultadosTexto.innerText=`Resultados sincronizados. API: ${games.length} partidos. Emparejados: ${actualizados}. Finalizados: ${finalizados}.`;
+   estadoResultadosTexto.innerText="Los resultados oficiales se actualizan automáticamente.";
   }
 
   if(mostrarAviso){
-   toastMsg(`Resultados actualizados. Finalizados: ${finalizados}`);
+   toastMsg("Resultados oficiales actualizados.");
   }
 
  }catch(e){
@@ -1933,12 +1965,11 @@ async function renderRanking(){
 
  if(usuariosOnline && usuariosOnline.length>0){
   lista=usuariosOnline;
- }else{
+ }else if(usuario){
   lista=[{
    id:usuario.id,
    nombre:usuario.nombre,
    apellido:usuario.apellido,
-   puntos:puntos,
    puntosPronosticos:usuario.puntosPronosticos || 0,
    triviaPuntos:usuario.triviaPuntos || 0,
    puntosTrivia:usuario.triviaPuntos || 0,
@@ -1946,49 +1977,86 @@ async function renderRanking(){
   }];
  }
 
- lista.sort((a,b)=>(b.puntos||0)-(a.puntos||0));
+ lista=lista.map(u=>{
+  const triviaPts=Number(u.triviaPuntos || u.puntosTrivia || 0);
+  const pronosticoPts=Number(u.puntosPronosticos || Math.max(Number(u.puntos || 0)-triviaPts,0));
+  return {...u, _pronosticoPts:pronosticoPts, _triviaPts:triviaPts};
+ });
 
- const posicion=lista.findIndex(u=>u.id===usuario.id)+1;
- const total=lista.length;
+ const listaPronosticos=[...lista].sort((a,b)=>b._pronosticoPts-a._pronosticoPts);
+ const listaTrivia=[...lista].sort((a,b)=>b._triviaPts-a._triviaPts);
+
+ const posicion=usuario ? listaPronosticos.findIndex(u=>u.id===usuario.id)+1 : 0;
+ const total=listaPronosticos.length;
 
  if(document.getElementById("posicionHome")){
   posicionHome.innerText = posicion>0 ? `${posicion}° de ${total}` : "Sin clasificar";
  }
+ if(document.getElementById("puntosHome")){
+  const yo=usuario ? listaPronosticos.find(u=>u.id===usuario.id) : null;
+  puntosHome.innerText = yo ? yo._pronosticoPts : (usuario?.puntosPronosticos || 0);
+ }
 
- const html=lista.map((u,i)=>{
-  const org=(u.comunidades && u.comunidades.length>0) ? `${u.comunidades.length} comunidad/es` : "Individual";
-  const totalPts=Number(u.puntos || 0);
-  const triviaPts=Number(u.triviaPuntos || u.puntosTrivia || 0);
-  const pronosticoPts=Number(u.puntosPronosticos || Math.max(totalPts-triviaPts,0));
+ const renderLista=(arr,tipo)=>{
+  if(!arr.length) return `<p class="small">Todavía no hay participantes en este ranking.</p>`;
+  return arr.map((u,i)=>{
+   const org=(u.comunidades && u.comunidades.length>0) ? `${u.comunidades.length} comunidad/es` : "Individual";
+   const pts=tipo==="trivia" ? u._triviaPts : u._pronosticoPts;
+   const detalle=tipo==="trivia"
+    ? `<span>🧠 Trivia: ${u._triviaPts}</span>`
+    : `<span>⚽ Pronósticos: ${u._pronosticoPts}</span>`;
 
-  return `
-  <div class="row">
-   <span>
-    ${i+1}. <b>${nombreRanking(u)}</b><br>
-    <small>${org}</small>
-    <span class="rankingDetalle">
-      <span>⚽ Pronósticos: ${pronosticoPts}</span>
-      <span>🧠 Trivia: ${triviaPts}</span>
-      <span>🏆 Total: ${totalPts}</span>
+   return `
+   <div class="row">
+    <span>
+     ${i+1}. <b>${nombreRanking(u)}</b><br>
+     <small>${org}</small>
+     <span class="rankingDetalle">${detalle}</span>
     </span>
-   </span>
-   <b>${totalPts} pts</b>
-  </div>`;
- }).join("");
+    <b>${pts} pts</b>
+   </div>`;
+  }).join("");
+ };
 
- ranking.innerHTML=html;
- rankingInicio.innerHTML=html;
+ if(document.getElementById("rankingInicio")){
+  rankingInicio.innerHTML=renderLista(listaPronosticos,"pronosticos");
+ }
+
+ if(document.getElementById("ranking")){
+  const mostrandoTrivia=rankingModo==="trivia";
+  ranking.innerHTML=renderLista(mostrandoTrivia ? listaTrivia : listaPronosticos, mostrandoTrivia ? "trivia" : "pronosticos");
+ }
+
+ if(document.getElementById("tabRankingPronosticos")){
+  tabRankingPronosticos.classList.toggle("active", rankingModo==="pronosticos");
+ }
+ if(document.getElementById("tabRankingTrivia")){
+  tabRankingTrivia.classList.toggle("active", rankingModo==="trivia");
+ }
+ if(document.getElementById("rankingSubtitulo")){
+  rankingSubtitulo.innerText = rankingModo==="trivia"
+   ? "Campeón de Trivia: sólo cuentan los puntos obtenidos respondiendo preguntas."
+   : "Campeón de pronósticos: sólo cuentan los puntos de partidos.";
+ }
+}
+
+function setRankingModo(modo){
+ rankingModo=modo;
+ renderRanking();
 }
 
 function renderPerfil(){
+ const puntosPronosticos=Number(usuario.puntosPronosticos || Math.max(Number(puntos||0)-Number(usuario.triviaPuntos||0),0));
+ const puntosTrivia=Number(usuario.triviaPuntos || usuario.puntosTrivia || 0);
+
  perfilCompleto.innerHTML=`
  <div class="badge">${usuario.insignia}</div>
  <div class="row"><span>Nombre</span><b>${usuario.nombre} ${usuario.apellido}</b></div>
  <div class="row"><span>Edad</span><b>${usuario.edad||"-"}</b></div>
  <div class="row"><span>Ciudad</span><b>${usuario.ciudad||"-"}</b></div>
  <div class="row"><span>Hincha de</span><b>${usuario.hincha||"-"}</b></div>
- <div class="row"><span>Puntos</span><b>${puntos}</b></div>
- <div class="row"><span>Puntos Trivia</span><b>${usuario.triviaPuntos||0}</b></div>
+ <div class="row"><span>⚽ Puntos Pronósticos</span><b>${puntosPronosticos}</b></div>
+ <div class="row"><span>🧠 Puntos Trivia</span><b>${puntosTrivia}</b></div>
  <div class="row"><span>Correctas Trivia</span><b>${usuario.triviaCorrectas||0}</b></div>
  <div class="row"><span>Racha Trivia</span><b>${usuario.triviaRacha||0}/5</b></div>
  <div class="row"><span>Comunidades</span><b>${comunidades.length}</b></div>`;
@@ -2108,7 +2176,7 @@ async function responderTrivia(opCod){
   await guardarUsuarioOnline();
  }
 
- if(document.getElementById("puntosHome")) puntosHome.innerText=puntos;
+ if(document.getElementById("puntosHome")) puntosHome.innerText=usuario.puntosPronosticos || 0;
  renderRanking();
 
  setTimeout(()=>renderTrivia(),1800);
