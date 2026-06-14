@@ -350,6 +350,76 @@ button.disabledBtn{
   margin:0 0 10px;
 }
 
+
+.resultadoFinalBox{
+  margin-top:12px;
+  background:#ffffff0b;
+  border:1px solid #56ff3344;
+  border-radius:16px;
+  padding:12px;
+}
+.resultadoFinalTitle{
+  color:#56ff33;
+  font-weight:900;
+  margin-bottom:8px;
+}
+.resultadoFinalScore{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  font-size:15px;
+  font-weight:900;
+}
+.resultadoFinalScore span{max-width:38%}
+.resultadoFinalPts{
+  margin-top:8px;
+  color:#ffd84c;
+  font-weight:900;
+  font-size:14px;
+}
+.sinPronostico{
+  margin-top:8px;
+  color:#ffcc66;
+  font-weight:900;
+  font-size:13px;
+}
+.partidosHoyOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.74);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:1200;
+}
+.partidosHoyModal{
+  width:100%;
+  max-width:390px;
+  max-height:88vh;
+  overflow:auto;
+  background:linear-gradient(180deg,#07182d,#03101f);
+  border:1px solid #56ff3355;
+  border-radius:28px;
+  padding:20px 18px 18px;
+  box-shadow:0 22px 70px #000;
+}
+.partidosHoyModal h2{margin:0 0 8px;font-size:24px}
+.partidosHoyItem{
+  background:#ffffff0b;
+  border:1px solid #ffffff18;
+  border-radius:16px;
+  padding:12px;
+  margin:9px 0;
+}
+.partidosHoyItem b{display:block;margin-bottom:4px}
+.partidosHoyHora{
+  color:#ffd84c;
+  font-size:13px;
+  font-weight:900;
+}
+
 </style>
 </head>
 
@@ -596,13 +666,18 @@ button.disabledBtn{
       <h3>2. Cierre de pronósticos</h3>
       <p class="small">Los pronósticos podrán cargarse o modificarse hasta 1 hora antes del inicio de cada partido.</p>
 
-      <h3>3. Sistema de puntuación</h3>
+      <h3>3. Pronósticos válidos</h3>
+      <p class="small">Un pronóstico sólo será válido cuando el participante presione el botón <b>Guardar pronóstico</b> antes del horario de cierre.</p>
+      <p class="small">Los valores iniciales que aparecen en pantalla son sólo una referencia visual. Si el participante no guarda el pronóstico, ese partido se considerará sin pronóstico realizado.</p>
+      <p class="small">Los partidos sin pronóstico guardado otorgan 0 puntos, aunque el resultado final coincida con los valores que aparecían por defecto.</p>
+
+      <h3>4. Sistema de puntuación</h3>
       <p class="small">🏆 Resultado exacto: +3 puntos</p>
       <p class="small">⚽ Ganador acertado: +1 punto</p>
       <p class="small">🤝 Empate acertado: +1 punto</p>
       <p class="small">❌ Pronóstico incorrecto: 0 puntos</p>
 
-      <h3>4. Puntos por Trivia</h3>
+      <h3>5. Puntos por Trivia</h3>
       <p class="small">La sección Trivia Mundialista tiene su propio ranking independiente. Sirve para jugar en los momentos sin partidos, sin mezclar sus puntos con los pronósticos.</p>
       <p class="small">✅ Para sumar puntos en Trivia, el participante deberá responder 5 preguntas correctas consecutivas.</p>
       <p class="small">⏱ Cada pregunta de Trivia tendrá 5 segundos para ser respondida.</p>
@@ -610,22 +685,22 @@ button.disabledBtn{
       <p class="small">❌ Si el participante responde mal o se queda sin tiempo antes de completar las 5 correctas consecutivas, la racha vuelve a cero y no suma puntos.</p>
       <p class="small">Los puntos de Trivia no se suman al ranking de Pronósticos. Habrá un campeón de Pronósticos y un campeón de Trivia.</p>
 
-      <h3>5. Comunidades</h3>
+      <h3>6. Comunidades</h3>
       <p class="small">Podés participar simultáneamente en empresas, comercios, familias, grupos de amigos, peñas y otras comunidades.</p>
 
-      <h3>6. Ranking de Pronósticos</h3>
+      <h3>7. Ranking de Pronósticos</h3>
       <p class="small">Es el ranking principal. Sólo cuenta los puntos obtenidos por resultados de partidos.</p>
 
-      <h3>7. Ranking por comunidad</h3>
+      <h3>8. Ranking por comunidad</h3>
       <p class="small">Cada comunidad tendrá su propia tabla de posiciones.</p>
 
-      <h3>8. Fair Play</h3>
+      <h3>9. Fair Play</h3>
       <p class="small">Cada participante deberá utilizar un único perfil.</p>
 
-      <h3>9. Desempates</h3>
+      <h3>10. Desempates</h3>
       <p class="small">Mayor cantidad de resultados exactos, luego mayor cantidad de aciertos de ganador y finalmente antigüedad del registro.</p>
 
-      <h3>10. Juego responsable</h3>
+      <h3>11. Juego responsable</h3>
       <p class="small">El juego compulsivo es perjudicial para tu salud y la de tu familia.</p>
       <p class="small">Línea de Prevención de la Ludopatía (CABA y Provincia de Buenos Aires): <b>0800-333-0300</b></p>
       <p class="small">Esta aplicación es recreativa, gratuita y no realiza apuestas con dinero real.</p>
@@ -690,6 +765,17 @@ button.disabledBtn{
 
     <button class="devDanger" onclick="confirmarReinicioDev()">Reiniciar aplicación</button>
     <button class="secondary" onclick="cerrarDevModal()">Cancelar</button>
+  </div>
+</div>
+
+
+<div id="partidosHoyOverlay" class="partidosHoyOverlay">
+  <div class="partidosHoyModal">
+    <h2>⚽ Partidos de hoy</h2>
+    <p id="partidosHoyTexto" class="small">Tenés partidos pendientes para pronosticar.</p>
+    <div id="partidosHoyLista"></div>
+    <button onclick="irAPronosticarHoy()">⚽ Ir a pronosticar</button>
+    <button class="secondary" onclick="cerrarModalPartidosHoy()">Más tarde</button>
   </div>
 </div>
 
@@ -970,6 +1056,7 @@ let pronosticos=leer("pronosticos",{});
 let puntos=leer("puntos",0);
 let firebaseDisponible=true;
 let rankingModo="pronosticos";
+let resultadosOficiales=leer("resultadosOficiales",{});
 
 async function guardarUsuarioOnline(){
  if(!usuario) return;
@@ -1013,6 +1100,98 @@ async function obtenerUsuariosOnline(){
   return null;
  }
 }
+
+
+async function cargarResultadosOficialesDesdeFirebase(){
+ try{
+  const snap=await db.collection("resultados").get();
+  const mapa={};
+  snap.forEach(doc=>{
+   const r=doc.data();
+   if(!r || doc.id==="_diagnostico" || doc.id==="prueba") return;
+   if(r.partidoId!==undefined && r.partidoId!==null){
+    mapa[Number(r.partidoId)] = r;
+   }
+   mapa[doc.id] = r;
+  });
+  resultadosOficiales=mapa;
+  guardar("resultadosOficiales",resultadosOficiales);
+  return mapa;
+ }catch(e){
+  console.error("Error cargando resultados oficiales:",e);
+  return resultadosOficiales || {};
+ }
+}
+
+function fechaArgentinaHoy(){
+ const partes=new Intl.DateTimeFormat("en-CA",{
+  timeZone:"America/Argentina/Buenos_Aires",
+  year:"numeric",
+  month:"2-digit",
+  day:"2-digit"
+ }).formatToParts(new Date());
+ const y=partes.find(p=>p.type==="year").value;
+ const m=partes.find(p=>p.type==="month").value;
+ const d=partes.find(p=>p.type==="day").value;
+ return `${y}-${m}-${d}`;
+}
+
+function partidosPendientesDeHoy(){
+ const hoy=fechaArgentinaHoy();
+ return fixture.filter(p=>{
+  const pr=pronosticos[p.id] || {};
+  const tienePronostico = pr.local!==undefined && pr.local!=="" && pr.visitante!==undefined && pr.visitante!=="";
+  return p.d===hoy && !partidoCerrado(p.d,p.h) && !tienePronostico;
+ });
+}
+
+function mostrarModalPartidosHoy(){
+ if(!usuario) return;
+
+ const pendientes=partidosPendientesDeHoy();
+ if(!pendientes.length) return;
+
+ const hoy=fechaArgentinaHoy();
+ const claveCerrado=`modalPartidosHoyCerrado_${usuario.id}_${hoy}`;
+ if(localStorage.getItem(claveCerrado)==="1") return;
+
+ partidosHoyTexto.innerText=`Tenés ${pendientes.length} partido/s pendientes para pronosticar. No te duermas, el Mundial no espera.`;
+ partidosHoyLista.innerHTML=pendientes.map(p=>`
+  <div class="partidosHoyItem">
+    <b>${bandera(p.l)} ${p.l} vs ${p.v} ${bandera(p.v)}</b>
+    <div class="partidosHoyHora">Cierra ${horaCierre(p.h)} hs Argentina · Partido ${p.h} hs</div>
+  </div>
+ `).join("");
+
+ partidosHoyOverlay.style.display="flex";
+}
+
+function cerrarModalPartidosHoy(){
+ const hoy=fechaArgentinaHoy();
+ if(usuario){
+  localStorage.setItem(`modalPartidosHoyCerrado_${usuario.id}_${hoy}`,"1");
+ }
+ partidosHoyOverlay.style.display="none";
+}
+
+function irAPronosticarHoy(){
+ const hoy=fechaArgentinaHoy();
+ const filtro=document.getElementById("filtroDia");
+ if(filtro){
+  cargarFiltroDias();
+  filtro.value=hoy;
+ }
+ partidosHoyOverlay.style.display="none";
+ showView("partidos");
+ setTimeout(()=>{
+  const filtro2=document.getElementById("filtroDia");
+  if(filtro2){
+   filtro2.value=hoy;
+   renderPartidos();
+  }
+ },250);
+}
+
 
 function nombreRanking(u){
  const nombre=(u.nombre || "").trim();
@@ -1257,7 +1436,9 @@ function mostrarHome(){
  renderPerfil();
  actualizarSelectInvitar();
  showView("inicio");
- sincronizarResultadosAutomaticos(false);
+ sincronizarResultadosAutomaticos(false)
+  .then(()=>cargarResultadosOficialesDesdeFirebase())
+  .then(()=>{ renderPartidos(); setTimeout(mostrarModalPartidosHoy,700); });
 }
 
 function showView(view){
@@ -1277,7 +1458,7 @@ function showView(view){
 
  if(view==="partidos"){
   cargarFiltroDias();
-  renderPartidos();
+  cargarResultadosOficialesDesdeFirebase().then(()=>renderPartidos());
  }
 
  if(view==="trivia"){
@@ -1661,6 +1842,7 @@ async function sincronizarResultadosAutomaticos(mostrarAviso=false){
   });
 
   await batch.commit();
+  await cargarResultadosOficialesDesdeFirebase();
 
   if(actualizados===0){
    await db.collection("resultados").doc("_diagnostico").set({
@@ -1799,6 +1981,32 @@ function renderPartidos(){
     const simultaneos=delDia.filter(x=>x.h===p.h).length>1;
     const cerrado=partidoCerrado(p.d,p.h);
     const cierre=horaCierre(p.h);
+    const codigo=`M${String(p.id).padStart(3,"0")}`;
+    const res=(resultadosOficiales && (resultadosOficiales[p.id] || resultadosOficiales[codigo])) || null;
+    const finalizado=!!(res && res.finalizado===true);
+    const tienePronostico = pr.local!==undefined && pr.local!=="" && pr.visitante!==undefined && pr.visitante!=="";
+    let resultadoFinalHtml="";
+
+    if(finalizado){
+     let puntosTxt="";
+     if(tienePronostico){
+      const calc=puntosPorPronostico(pr.local,pr.visitante,res.golesLocal,res.golesVisitante);
+      puntosTxt=`<div class="resultadoFinalPts">⭐ Puntos obtenidos en este partido: ${calc.puntos}</div>`;
+     }else{
+      puntosTxt=`<div class="sinPronostico">⚠ No guardaste pronóstico para este partido. No suma puntos.</div>`;
+     }
+
+     resultadoFinalHtml=`
+      <div class="resultadoFinalBox">
+        <div class="resultadoFinalTitle">🏁 Resultado final</div>
+        <div class="resultadoFinalScore">
+          <span>${bandera(p.l)} ${p.l}</span>
+          <span>${Number(res.golesLocal)} - ${Number(res.golesVisitante)}</span>
+          <span style="text-align:right">${p.v} ${bandera(p.v)}</span>
+        </div>
+        ${puntosTxt}
+      </div>`;
+    }
 
     html+=`
     <div class="match">
@@ -1822,10 +2030,12 @@ function renderPartidos(){
       </div>
 
       <div class="score">
-        <input id="l${p.id}" type="number" value="${pr.local??""}" placeholder="0" ${cerrado?"disabled":""}>
+        <input id="l${p.id}" type="number" value="${pr.local??""}" placeholder="-" ${cerrado?"disabled":""}>
         <span>-</span>
-        <input id="v${p.id}" type="number" value="${pr.visitante??""}" placeholder="0" ${cerrado?"disabled":""}>
+        <input id="v${p.id}" type="number" value="${pr.visitante??""}" placeholder="-" ${cerrado?"disabled":""}>
       </div>
+
+      ${resultadoFinalHtml}
 
       <button onclick="guardarPronostico(${p.id})" ${cerrado?'style="opacity:.45;pointer-events:none"':""}>
         ${cerrado ? "Pronóstico cerrado" : "Guardar pronóstico"}
@@ -1839,6 +2049,7 @@ function renderPartidos(){
 
  partidos.innerHTML=html;
 }
+
 
 
 async function guardarPronostico(id){
@@ -1869,6 +2080,7 @@ async function guardarPronostico(id){
  toastMsg("Pronóstico guardado online.");
  mostrarHome();
  showView("partidos");
+ setTimeout(mostrarModalPartidosHoy,500);
 }
 
 function horaCierre(hora){
