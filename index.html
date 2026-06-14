@@ -1057,6 +1057,7 @@ let puntos=leer("puntos",0);
 let firebaseDisponible=true;
 let rankingModo="pronosticos";
 let resultadosOficiales=leer("resultadosOficiales",{});
+let modalPartidosHoySilenciadoSesion=false;
 
 async function guardarUsuarioOnline(){
  if(!usuario) return;
@@ -1147,6 +1148,7 @@ function partidosPendientesDeHoy(){
 
 function mostrarModalPartidosHoy(){
  if(!usuario) return;
+ if(modalPartidosHoySilenciadoSesion) return;
 
  const pendientes=partidosPendientesDeHoy();
  if(!pendientes.length) return;
@@ -1175,6 +1177,7 @@ function cerrarModalPartidosHoy(){
 }
 
 function irAPronosticarHoy(){
+ modalPartidosHoySilenciadoSesion=true;
  const hoy=fechaArgentinaHoy();
  const filtro=document.getElementById("filtroDia");
  if(filtro){
@@ -2080,7 +2083,6 @@ async function guardarPronostico(id){
  toastMsg("Pronóstico guardado online.");
  mostrarHome();
  showView("partidos");
- setTimeout(mostrarModalPartidosHoy,500);
 }
 
 function horaCierre(hora){
