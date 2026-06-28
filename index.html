@@ -1199,6 +1199,30 @@ function fechaArgentinaHoy(){
  return `${y}-${m}-${d}`;
 }
 
+
+function fechaActualOProximaConPartidos(){
+ const hoy=fechaArgentinaHoy();
+ const fechas=[...new Set(fixture.map(p=>p.d))].sort();
+
+ if(fechas.includes(hoy)) return hoy;
+
+ const proxima=fechas.find(f=>f>hoy);
+ if(proxima) return proxima;
+
+ return fechas[fechas.length-1] || "TODOS";
+}
+
+function seleccionarDiaActualOProximo(forzar=false){
+ const select=document.getElementById("filtroDia");
+ if(!select) return;
+
+ const recomendado=fechaActualOProximaConPartidos();
+
+ if(forzar || !select.value || select.value==="TODOS"){
+  select.value=recomendado;
+ }
+}
+
 function partidosPendientesDeHoy(){
  const hoy=fechaArgentinaHoy();
  return fixture.filter(p=>{
@@ -1523,6 +1547,7 @@ function showView(view){
 
  if(view==="partidos"){
   cargarFiltroDias();
+  seleccionarDiaActualOProximo(true);
   cargarResultadosOficialesDesdeFirebase().then(()=>renderPartidos());
  }
 
@@ -1612,10 +1637,10 @@ function cargarFiltroDias(){
   select.innerHTML += `<option value="${fecha}">${formatearFecha(fecha)}</option>`;
  });
 
- if([...select.options].some(o=>o.value===valorActual)){
+ if([...select.options].some(o=>o.value===valorActual) && valorActual!=="TODOS"){
   select.value = valorActual;
  }else{
-  select.value = "TODOS";
+  seleccionarDiaActualOProximo(true);
  }
 }
 
