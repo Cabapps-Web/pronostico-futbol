@@ -579,6 +579,12 @@ button.disabledBtn{
         <option value="J">Grupo J</option>
         <option value="K">Grupo K</option>
         <option value="L">Grupo L</option>
+        <option value="16avos de final">16avos de final</option>
+        <option value="Octavos de final">Octavos de final</option>
+        <option value="Cuartos de final">Cuartos de final</option>
+        <option value="Semifinal">Semifinal</option>
+        <option value="Tercer puesto">Tercer puesto</option>
+        <option value="Final">Final</option>
       </select>
       <select id="filtroDia" onchange="renderPartidos()">
         <option value="TODOS">Todos los días</option>
@@ -958,7 +964,9 @@ const flag={
 "France":"🇫🇷","Senegal":"🇸🇳","Iraq":"🇮🇶","Norway":"🇳🇴",
 "Argentina":"🇦🇷","Algeria":"🇩🇿","Austria":"🇦🇹","Jordan":"🇯🇴",
 "Portugal":"🇵🇹","DR Congo":"🇨🇩","Uzbekistan":"🇺🇿","Colombia":"🇨🇴",
-"England":"🏴","Croatia":"🇭🇷","Ghana":"🇬🇭","Panama":"🇵🇦"
+"England":"🏴","Croatia":"🇭🇷","Ghana":"🇬🇭","Panama":"🇵🇦",
+"Cape Verde":"🇨🇻","Congo DR":"🇨🇩","Bosnia-Herzegovina":"🇧🇦",
+"Winner Match 73":"🏆","Winner Match 74":"🏆","Winner Match 75":"🏆","Winner Match 76":"🏆","Winner Match 77":"🏆","Winner Match 78":"🏆","Winner Match 79":"🏆","Winner Match 80":"🏆","Winner Match 81":"🏆","Winner Match 82":"🏆","Winner Match 83":"🏆","Winner Match 84":"🏆","Winner Match 85":"🏆","Winner Match 86":"🏆","Winner Match 87":"🏆","Winner Match 88":"🏆","Winner Match 89":"🏆","Winner Match 90":"🏆","Winner Match 91":"🏆","Winner Match 92":"🏆","Winner Match 93":"🏆","Winner Match 94":"🏆","Winner Match 95":"🏆","Winner Match 96":"🏆","Winner Match 97":"🏆","Winner Match 98":"🏆","Winner Match 99":"🏆","Winner Match 100":"🏆","Winner Match 101":"🏆","Winner Match 102":"🏆","Loser Match 101":"🥉","Loser Match 102":"🥉"
 };
 
 const fixture=[
@@ -1044,8 +1052,62 @@ const fixture=[
 {g:"L",d:"2026-06-23",h:"17:00",l:"England",v:"Ghana"},
 {g:"L",d:"2026-06-23",h:"20:00",l:"Croatia",v:"Panama"},
 {g:"L",d:"2026-06-27",h:"18:00",l:"England",v:"Panama"},
-{g:"L",d:"2026-06-27",h:"18:00",l:"Croatia",v:"Ghana"}
+{g:"L",d:"2026-06-27",h:"18:00",l:"Croatia",v:"Ghana"},
+
+{g:"16avos de final",d:"2026-06-28",h:"16:00",l:"South Africa",v:"Canada"},
+{g:"16avos de final",d:"2026-06-29",h:"14:00",l:"Brazil",v:"Japan"},
+{g:"16avos de final",d:"2026-06-29",h:"17:30",l:"Germany",v:"Paraguay"},
+{g:"16avos de final",d:"2026-06-30",h:"18:00",l:"France",v:"Sweden"},
+{g:"16avos de final",d:"2026-06-30",h:"21:00",l:"Netherlands",v:"Morocco"},
+{g:"16avos de final",d:"2026-07-01",h:"13:00",l:"Ivory Coast",v:"Norway"},
+{g:"16avos de final",d:"2026-07-01",h:"22:00",l:"Mexico",v:"Ecuador"},
+{g:"16avos de final",d:"2026-07-01",h:"13:00",l:"England",v:"DR Congo"},
+{g:"16avos de final",d:"2026-07-01",h:"21:00",l:"United States",v:"Bosnia and Herzegovina"},
+{g:"16avos de final",d:"2026-07-01",h:"17:00",l:"Belgium",v:"Senegal"},
+{g:"16avos de final",d:"2026-07-02",h:"20:00",l:"Portugal",v:"Croatia"},
+{g:"16avos de final",d:"2026-07-02",h:"16:00",l:"Spain",v:"Austria"},
+{g:"16avos de final",d:"2026-07-03",h:"00:00",l:"Switzerland",v:"Algeria"},
+{g:"16avos de final",d:"2026-07-03",h:"15:00",l:"Australia",v:"Egypt"},
+{g:"16avos de final",d:"2026-07-03",h:"19:00",l:"Argentina",v:"Cape Verde"},
+{g:"16avos de final",d:"2026-07-03",h:"22:30",l:"Colombia",v:"Ghana"},
+
+{g:"Octavos de final",d:"2026-07-04",h:"18:00",l:"Winner Match 75",v:"Winner Match 76"},
+{g:"Octavos de final",d:"2026-07-04",h:"14:00",l:"Winner Match 73",v:"Winner Match 77"},
+{g:"Octavos de final",d:"2026-07-05",h:"17:00",l:"Winner Match 74",v:"Winner Match 78"},
+{g:"Octavos de final",d:"2026-07-05",h:"21:00",l:"Winner Match 79",v:"Winner Match 80"},
+{g:"Octavos de final",d:"2026-07-06",h:"16:00",l:"Winner Match 83",v:"Winner Match 84"},
+{g:"Octavos de final",d:"2026-07-06",h:"18:00",l:"Winner Match 81",v:"Winner Match 82"},
+{g:"Octavos de final",d:"2026-07-07",h:"13:00",l:"Winner Match 86",v:"Winner Match 88"},
+{g:"Octavos de final",d:"2026-07-07",h:"17:00",l:"Winner Match 85",v:"Winner Match 87"},
+
+{g:"Cuartos de final",d:"2026-07-09",h:"17:00",l:"Winner Match 89",v:"Winner Match 90"},
+{g:"Cuartos de final",d:"2026-07-10",h:"16:00",l:"Winner Match 93",v:"Winner Match 94"},
+{g:"Cuartos de final",d:"2026-07-11",h:"18:00",l:"Winner Match 91",v:"Winner Match 92"},
+{g:"Cuartos de final",d:"2026-07-11",h:"22:00",l:"Winner Match 95",v:"Winner Match 96"},
+
+{g:"Semifinal",d:"2026-07-14",h:"16:00",l:"Winner Match 97",v:"Winner Match 98"},
+{g:"Semifinal",d:"2026-07-15",h:"16:00",l:"Winner Match 99",v:"Winner Match 100"},
+
+{g:"Tercer puesto",d:"2026-07-18",h:"18:00",l:"Loser Match 101",v:"Loser Match 102"},
+{g:"Final",d:"2026-07-19",h:"16:00",l:"Winner Match 101",v:"Winner Match 102"}
 ].map((p,i)=>({...p,id:i+1}));
+
+
+function esEliminatoria(p){
+ return String(p.g || "").length > 1;
+}
+
+function etiquetaFase(p){
+ return esEliminatoria(p) ? p.g : "Grupo " + p.g;
+}
+
+function nombreMostradoPartido(p,res,lado){
+ const valor = lado==="local" ? p.l : p.v;
+ if(res && res[lado]){
+  return res[lado];
+ }
+ return valor;
+}
 
 function guardar(k,v){localStorage.setItem(k,JSON.stringify(v))}
 function leer(k,d){return JSON.parse(localStorage.getItem(k))||d}
@@ -1160,7 +1222,7 @@ function mostrarModalPartidosHoy(){
  partidosHoyTexto.innerText=`Tenés ${pendientes.length} partido/s pendientes para pronosticar. No te duermas, el Mundial no espera.`;
  partidosHoyLista.innerHTML=pendientes.map(p=>`
   <div class="partidosHoyItem">
-    <b>${bandera(p.l)} ${p.l} vs ${p.v} ${bandera(p.v)}</b>
+    <b>${etiquetaFase(p)} · ${bandera(p.l)} ${p.l} vs ${p.v} ${bandera(p.v)}</b>
     <div class="partidosHoyHora">Cierra ${horaCierre(p.h)} hs Argentina · Partido ${p.h} hs</div>
   </div>
  `).join("");
@@ -1745,17 +1807,21 @@ function buscarGameApiParaPartido(partido,games){
  const local=normalizarNombreEquipo(partido.l);
  const visitante=normalizarNombreEquipo(partido.v);
  const fecha=partido.d;
+ const codigo=String(partido.id);
 
  return games.find(g=>{
-  const gh=normalizarNombreEquipo(g.home_team_name_en || g.home_team || g.homeTeam || g.local || "");
-  const ga=normalizarNombreEquipo(g.away_team_name_en || g.away_team || g.awayTeam || g.visitor || "");
+  const apiId=String(g.id || g._id || g.match_id || g.matchId || "");
+  if(apiId && apiId===codigo) return true;
+
+  const gh=normalizarNombreEquipo(g.home_team_name_en || g.home_team || g.homeTeam || g.local || g.home_team_name || "");
+  const ga=normalizarNombreEquipo(g.away_team_name_en || g.away_team || g.awayTeam || g.visitor || g.away_team_name || "");
   const gd=normalizarFechaApi(g.local_date || g.date || g.datetime || g.kickoff || "");
   const grupoApi=String(g.group || "").toUpperCase();
   const grupoFixture=String(partido.g || "").toUpperCase();
 
   const equiposCoinciden = gh===local && ga===visitante;
   const fechaCoincide = !gd || gd===fecha;
-  const grupoCoincide = !grupoApi || grupoApi===grupoFixture;
+  const grupoCoincide = esEliminatoria(partido) || !grupoApi || grupoApi===grupoFixture;
 
   return equiposCoinciden && fechaCoincide && grupoCoincide;
  });
@@ -1819,6 +1885,9 @@ async function sincronizarResultadosAutomaticos(mostrarAviso=false){
    const golesLocal = mantenerFinalizado ? Number(existente.golesLocal || 0) : apiGolesLocal;
    const golesVisitante = mantenerFinalizado ? Number(existente.golesVisitante || 0) : apiGolesVisitante;
 
+   const apiLocalNombre=game.home_team_name_en || game.home_team || game.homeTeam || game.local || game.home_team_name || partido.l;
+   const apiVisitanteNombre=game.away_team_name_en || game.away_team || game.awayTeam || game.visitor || game.away_team_name || partido.v;
+
    const ref=db.collection("resultados").doc(codigo);
    batch.set(ref,{
     id:codigo,
@@ -1829,8 +1898,8 @@ async function sincronizarResultadosAutomaticos(mostrarAviso=false){
     hora:partido.h,
     apiFecha:normalizarFechaApi(game.local_date || game.date || ""),
     apiHora:normalizarHoraApi(game.local_date || game.date || ""),
-    local:partido.l,
-    visitante:partido.v,
+    local:apiLocalNombre,
+    visitante:apiVisitanteNombre,
     golesLocal:golesLocal,
     golesVisitante:golesVisitante,
     finalizado:finalizado,
@@ -1972,7 +2041,7 @@ function renderPartidos(){
 
  grupos.forEach(g=>{
   const delGrupo=lista.filter(p=>p.g===g);
-  html+=`<div class="groupBlock"><div class="groupTitle">Grupo ${g}</div>`;
+  html+=`<div class="groupBlock"><div class="groupTitle">${String(g).length>1 ? g : "Grupo " + g}</div>`;
   const fechas=[...new Set(delGrupo.map(p=>p.d))];
 
   fechas.forEach(fecha=>{
@@ -1987,6 +2056,8 @@ function renderPartidos(){
     const codigo=`M${String(p.id).padStart(3,"0")}`;
     const res=(resultadosOficiales && (resultadosOficiales[p.id] || resultadosOficiales[codigo])) || null;
     const finalizado=!!(res && res.finalizado===true);
+    const localDisplay=nombreMostradoPartido(p,res,"local");
+    const visitanteDisplay=nombreMostradoPartido(p,res,"visitante");
     const tienePronostico = pr.local!==undefined && pr.local!=="" && pr.visitante!==undefined && pr.visitante!=="";
     let resultadoFinalHtml="";
 
@@ -2003,9 +2074,9 @@ function renderPartidos(){
       <div class="resultadoFinalBox">
         <div class="resultadoFinalTitle">🏁 Resultado final</div>
         <div class="resultadoFinalScore">
-          <span>${bandera(p.l)} ${p.l}</span>
+          <span>${bandera(localDisplay)} ${localDisplay}</span>
           <span>${Number(res.golesLocal)} - ${Number(res.golesVisitante)}</span>
-          <span style="text-align:right">${p.v} ${bandera(p.v)}</span>
+          <span style="text-align:right">${visitanteDisplay} ${bandera(visitanteDisplay)}</span>
         </div>
         ${puntosTxt}
       </div>`;
@@ -2014,7 +2085,7 @@ function renderPartidos(){
     html+=`
     <div class="match">
       <div class="matchHeader">
-        <span class="groupTag">Grupo ${p.g}</span>
+        <span class="groupTag">${etiquetaFase(p)}</span>
         <span class="timeTag">🕘 ${p.h} hs Argentina</span>
       </div>
 
@@ -2027,9 +2098,9 @@ function renderPartidos(){
       </div>
 
       <div class="teams">
-        <span class="team">${bandera(p.l)} ${p.l}</span>
+        <span class="team">${bandera(localDisplay)} ${localDisplay}</span>
         <span class="vs">VS</span>
-        <span class="team" style="text-align:right">${p.v} ${bandera(p.v)}</span>
+        <span class="team" style="text-align:right">${visitanteDisplay} ${bandera(visitanteDisplay)}</span>
       </div>
 
       <div class="score">
